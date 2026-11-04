@@ -145,6 +145,37 @@
     {%- elsif on_sale -%}
       <span class="badge badge--sale">{{ 'products.product.on_sale' | t }}</span>
     {%- endif -%}
+    {%- if settings.card_quick_add and product.available -%}
+      {%- assign quick_id = 'Quick-' | append: product.id | append: '-' | append: section.id -%}
+      <button type="button" class="product-card__quick-toggle" data-quick-open aria-expanded="false" aria-controls="{{ quick_id }}">
+        {%- render 'icon', name: 'cart' -%}
+        <span class="visually-hidden">{{ 'products.product.quick_add' | t }}</span>
+      </button>
+      <div class="product-card__quick" id="{{ quick_id }}" data-quick-panel>
+        <div class="product-card__quick-header">
+          <span>{% if product.has_only_default_variant %}{{ 'products.product.quick_add' | t }}{% else %}{{ 'products.product.choose_size' | t }}{% endif %}</span>
+          <button type="button" class="product-card__quick-close" data-quick-close>
+            {%- render 'icon', name: 'close' -%}
+            <span class="visually-hidden">{{ 'general.close' | t }}</span>
+          </button>
+        </div>
+        {%- form 'product', product, class: 'product-card__quick-form', data-product-form: '' -%}
+          {%- if product.has_only_default_variant -%}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <button type="submit" class="button button--full" data-add-to-cart>{{ 'products.product.add_to_cart' | t }}</button>
+          {%- else -%}
+            <div class="product-card__quick-sizes" role="group" aria-label="{{ product.options.first | escape }}">
+              {%- for variant in product.variants -%}
+                <button type="submit" name="id" value="{{ variant.id }}" class="product-card__quick-size"{% unless variant.available %} disabled{% endunless %}>
+                  {{- variant.title -}}
+                </button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+          <p class="form-message form-message--error" data-form-error hidden></p>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
   </card-gallery>
 
   <div class="product-card__info">

@@ -12,7 +12,10 @@
     assign cart_types = ''
     assign cart_ids = ''
     for item in cart.items
-      assign item_type = item.product.type | default: item.product.category.name
+      assign item_type = item.product.type
+      if item_type == blank
+        assign item_type = item.product.title | downcase | replace: 'pré-venda', '' | replace: 'pre-venda', '' | strip | split: ' ' | first
+      endif
       assign cart_types = cart_types | append: item_type | append: '|'
       assign cart_ids = cart_ids | append: item.product_id | append: '|'
     endfor

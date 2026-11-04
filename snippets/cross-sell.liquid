@@ -1,5 +1,5 @@
 {% doc %}
-  Renders complementary products: never the same product type (or category, when type is empty) as the excluded ones,
+  Renders complementary products: never the same product type (or the first word of the title, e.g. "Vestido", when type is empty) as the excluded ones,
   picking one product per type before repeating any type.
 
   @param {string} exclude_types - Product types to avoid, separated by "|"
@@ -32,7 +32,10 @@
       continue
     endif
 
-    assign candidate_type = candidate.type | default: candidate.category.name | downcase | strip
+    assign candidate_type = candidate.type | downcase | strip
+    if candidate_type == blank
+      assign candidate_type = candidate.title | downcase | replace: 'pré-venda', '' | replace: 'pre-venda', '' | strip | split: ' ' | first
+    endif
     if candidate_type == blank
       continue
     endif
@@ -60,7 +63,10 @@
       continue
     endif
 
-    assign candidate_type = candidate.type | default: candidate.category.name | downcase | strip
+    assign candidate_type = candidate.type | downcase | strip
+    if candidate_type == blank
+      assign candidate_type = candidate.title | downcase | replace: 'pré-venda', '' | replace: 'pre-venda', '' | strip | split: ' ' | first
+    endif
     assign candidate_key = '|' | append: candidate_type | append: '|'
     if candidate_type != blank and blocked_types contains candidate_key
       continue

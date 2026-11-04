@@ -118,7 +118,9 @@
       "color": "Cor",
       "other_colors": "Outras cores",
       "thumbnails": "Fotos do produto",
-      "go_to_image": "Ver foto {{ index }}"
+      "go_to_image": "Ver foto {{ index }}",
+      "quick_add": "Compra rápida",
+      "choose_size": "Escolha o tamanho"
     },
     "feed": {
       "load_more": "Carregar mais"

@@ -1026,6 +1026,40 @@
   }
   customElements.define('color-swatches', ColorSwatches);
 
+  /* ---------- Compra rápida nos cards (sacolinha → tamanhos → carrinho) ---------- */
+  const setQuickOpen = (card, open) => {
+    if (!card) return;
+    card.classList.toggle('is-quick-open', open);
+    card.querySelector('[data-quick-open]')?.setAttribute('aria-expanded', String(open));
+  };
+  document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-quick-open]');
+    const close = event.target.closest('[data-quick-close]');
+    const openCards = document.querySelectorAll('.product-card.is-quick-open');
+    if (toggle) {
+      event.preventDefault();
+      const card = toggle.closest('.product-card');
+      const willOpen = !card.classList.contains('is-quick-open');
+      openCards.forEach((other) => other !== card && setQuickOpen(other, false));
+      setQuickOpen(card, willOpen);
+      if (willOpen) card.querySelector('.product-card__quick-size:not([disabled]), [data-quick-panel] [data-add-to-cart]')?.focus({ preventScroll: true });
+      return;
+    }
+    if (close) {
+      setQuickOpen(close.closest('.product-card'), false);
+      return;
+    }
+    if (!event.target.closest('[data-quick-panel]')) openCards.forEach((card) => setQuickOpen(card, false));
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') document.querySelectorAll('.product-card.is-quick-open').forEach((card) => setQuickOpen(card, false));
+  });
+  /* Depois de adicionar, fecha o painel do card */
+  document.addEventListener('submit', (event) => {
+    const card = event.target.closest('.product-card');
+    if (card && event.target.closest('[data-quick-panel]')) setTimeout(() => setQuickOpen(card, false), 600);
+  });
+
   window.theme.templateName = document.body.className.match(/template-([\w-]+)/)?.[1];
 
   setupHeader();

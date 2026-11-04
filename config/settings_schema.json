@@ -246,6 +246,13 @@
         "label": "Nomes da opção de tamanho",
         "info": "Separados por vírgula",
         "default": "Tamanho,Size,Talla"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_quick_add",
+        "label": "Compra rápida (sacolinha)",
+        "info": "Ícone de sacola na foto do card: mostra os tamanhos e adiciona ao carrinho sem abrir o produto",
+        "default": true
       }
     ]
   },
