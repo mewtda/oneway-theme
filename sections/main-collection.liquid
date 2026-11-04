@@ -175,6 +175,82 @@
           </div>
 
           <form class="drawer__body filter-form" data-collection-filters>
+            {%- if section.settings.enable_filtering -%}
+              {%- liquid
+                # Ordem: 1º tamanho, 2º categoria, depois os demais filtros
+                assign size_names = section.settings.size_filter_names | downcase | split: ','
+                assign category_names = section.settings.category_filter_names | downcase | split: ','
+              -%}
+              {%- for priority in (0..2) -%}
+                {%- for filter in collection.filters -%}
+                  {%- liquid
+                    assign filter_label = filter.label | downcase | strip
+                    assign filter_priority = 2
+                    if filter.param_name contains 'option.tamanho' or filter.param_name contains 'option.size'
+                      assign filter_priority = 0
+                    endif
+                    for size_name in size_names
+                      assign clean_name = size_name | strip
+                      if clean_name != blank and filter_label == clean_name
+                        assign filter_priority = 0
+                      endif
+                    endfor
+                    if filter_priority == 2
+                      if filter.param_name contains 'category' or filter.param_name contains 'product_type'
+                        assign filter_priority = 1
+                      else
+                        for category_name in category_names
+                          assign clean_name = category_name | strip
+                          if clean_name != blank and filter_label == clean_name
+                            assign filter_priority = 1
+                          endif
+                        endfor
+                      endif
+                    endif
+                  -%}
+                  {%- if filter_priority == priority -%}
+                    <details class="filter-group filter-group--collapsible"{% if filter.active_values.size > 0 or filter_priority < 2 %} open{% endif %}>
+                      <summary class="filter-group__title">
+                        {{ filter.label }}
+                        {%- if filter.active_values.size > 0 %} ({{ filter.active_values.size }}){% endif %}
+                        {% render 'icon', name: 'plus' %}
+                      </summary>
+                      {%- case filter.type -%}
+                        {%- when 'list', 'boolean' -%}
+                          <ul class="filter-group__list{% if filter_priority == 0 %} filter-group__list--pills{% elsif filter.presentation == 'swatch' %} filter-group__list--swatch{% endif %}">
+                            {%- for value in filter.values -%}
+                              {%- assign disabled = false -%}
+                              {%- if value.count == 0 and value.active == false -%}{%- assign disabled = true -%}{%- endif -%}
+                              <li>
+                                <label class="filter-option{% if disabled %} is-disabled{% endif %}">
+                                  <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"{% if value.active %} checked{% endif %}{% if disabled %} disabled{% endif %}>
+                                  {%- if filter.presentation == 'swatch' and value.swatch.color -%}
+                                    <span class="filter-option__swatch" style="background: {{ value.swatch.color }};"></span>
+                                  {%- endif -%}
+                                  <span>{{ value.label }}</span>
+                                  <small>({{ value.count }})</small>
+                                </label>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- when 'price_range' -%}
+                          <div class="filter-price">
+                            <label>
+                              <span>{{ 'collections.filters.from' | t }}</span>
+                              <input type="number" name="{{ filter.min_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100 }}" placeholder="0"{% if filter.min_value.value %} value="{{ filter.min_value.value | divided_by: 100 }}"{% endif %}>
+                            </label>
+                            <label>
+                              <span>{{ 'collections.filters.to' | t }}</span>
+                              <input type="number" name="{{ filter.max_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100 }}" placeholder="{{ filter.range_max | divided_by: 100 }}"{% if filter.max_value.value %} value="{{ filter.max_value.value | divided_by: 100 }}"{% endif %}>
+                            </label>
+                          </div>
+                      {%- endcase -%}
+                    </details>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endfor -%}
+            {%- endif -%}
+
             {%- if section.settings.enable_sorting -%}
               <fieldset class="filter-group">
                 <legend class="filter-group__title">{{ 'collections.sorting.title' | t }}</legend>
@@ -189,48 +265,6 @@
                   {%- endfor -%}
                 </ul>
               </fieldset>
-            {%- endif -%}
-
-            {%- if section.settings.enable_filtering -%}
-              {%- for filter in collection.filters -%}
-                <details class="filter-group filter-group--collapsible"{% if filter.active_values.size > 0 or forloop.first %} open{% endif %}>
-                  <summary class="filter-group__title">
-                    {{ filter.label }}
-                    {%- if filter.active_values.size > 0 %} ({{ filter.active_values.size }}){% endif %}
-                    {% render 'icon', name: 'plus' %}
-                  </summary>
-                  {%- case filter.type -%}
-                    {%- when 'list', 'boolean' -%}
-                      <ul class="filter-group__list{% if filter.presentation == 'swatch' %} filter-group__list--swatch{% endif %}">
-                        {%- for value in filter.values -%}
-                          {%- assign disabled = false -%}
-                          {%- if value.count == 0 and value.active == false -%}{%- assign disabled = true -%}{%- endif -%}
-                          <li>
-                            <label class="filter-option{% if disabled %} is-disabled{% endif %}">
-                              <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"{% if value.active %} checked{% endif %}{% if disabled %} disabled{% endif %}>
-                              {%- if filter.presentation == 'swatch' and value.swatch.color -%}
-                                <span class="filter-option__swatch" style="background: {{ value.swatch.color }};"></span>
-                              {%- endif -%}
-                              <span>{{ value.label }}</span>
-                              <small>({{ value.count }})</small>
-                            </label>
-                          </li>
-                        {%- endfor -%}
-                      </ul>
-                    {%- when 'price_range' -%}
-                      <div class="filter-price">
-                        <label>
-                          <span>{{ 'collections.filters.from' | t }}</span>
-                          <input type="number" name="{{ filter.min_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100 }}" placeholder="0"{% if filter.min_value.value %} value="{{ filter.min_value.value | divided_by: 100 }}"{% endif %}>
-                        </label>
-                        <label>
-                          <span>{{ 'collections.filters.to' | t }}</span>
-                          <input type="number" name="{{ filter.max_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100 }}" placeholder="{{ filter.range_max | divided_by: 100 }}"{% if filter.max_value.value %} value="{{ filter.max_value.value | divided_by: 100 }}"{% endif %}>
-                        </label>
-                      </div>
-                  {%- endcase -%}
-                </details>
-              {%- endfor -%}
             {%- endif -%}
           </form>
 
@@ -405,6 +439,8 @@
     { "type": "link_list", "id": "category_menu", "label": "Ou use um menu próprio" },
     { "type": "header", "content": "Filtros" },
     { "type": "checkbox", "id": "enable_filtering", "label": "Habilitar filtros", "default": true },
+    { "type": "text", "id": "size_filter_names", "label": "Nomes do filtro de tamanho", "info": "Aparece primeiro, em botões. Separados por vírgula", "default": "Tamanho,Size,Talla" },
+    { "type": "text", "id": "category_filter_names", "label": "Nomes do filtro de categoria", "info": "Aparece em segundo. Categoria e Tipo de produto da Shopify já são reconhecidos", "default": "Categoria,Tipo de produto,Tipo" },
     { "type": "checkbox", "id": "enable_sorting", "label": "Habilitar ordenação", "default": true }
   ],
   "blocks": [
