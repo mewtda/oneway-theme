@@ -43,7 +43,7 @@
           "type": "banner",
           "settings": {
             "image": "shopify://shop_images/corcorrigidaIMG_9089.jpg",
-            "collection": "",
+            "collection": "party",
             "eyebrow": "",
             "title": "Party Collection",
             "link": "shopify://collections/party",
@@ -58,7 +58,7 @@
           "type": "banner",
           "settings": {
             "image": "shopify://shop_images/ONEWAYJUL260487.jpg",
-            "collection": "",
+            "collection": "beachwear",
             "eyebrow": "",
             "title": "Beachwear",
             "link": "shopify://collections/beachwear",
@@ -72,7 +72,8 @@
         "conjuntos": {
           "type": "banner",
           "settings": {
-            "collection": "",
+            "image": "shopify://shop_images/Conjunto-Malha-Off-White-Blusa-Mini-Saia-4.jpg",
+            "collection": "conjunto",
             "eyebrow": "",
             "title": "Conjuntos",
             "link": "shopify://collections/conjunto",
@@ -86,10 +87,26 @@
         "acessorios": {
           "type": "banner",
           "settings": {
-            "collection": "",
+            "image": "shopify://shop_images/IMG_1597.jpg",
+            "collection": "acessorios",
             "eyebrow": "",
             "title": "Acessórios",
             "link": "shopify://collections/acessorios",
+            "button_label": "Ver seleção",
+            "desktop_width": "half",
+            "ratio_desktop": "4 / 5",
+            "ratio_mobile": "4 / 5",
+            "text_position": "bottom-center"
+          }
+        },
+        "banner_DQ3BYA": {
+          "type": "banner",
+          "settings": {
+            "image": "shopify://shop_images/corcorrigidaIMG_8737.jpg",
+            "collection": "vestidos",
+            "eyebrow": "",
+            "title": "Vestidos",
+            "link": "",
             "button_label": "Ver seleção",
             "desktop_width": "half",
             "ratio_desktop": "4 / 5",
@@ -102,7 +119,8 @@
         "party",
         "beachwear",
         "conjuntos",
-        "acessorios"
+        "acessorios",
+        "banner_DQ3BYA"
       ],
       "settings": {
         "heading": "",
