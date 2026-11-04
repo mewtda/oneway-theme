@@ -30,7 +30,7 @@ Sequência padrão: 2 lado a lado → destaque → 2 × 2 → banner editorial �
 
 - **Filtrar e ordenar**: barra fixa abaixo do cabeçalho, abrindo uma gaveta (de baixo para cima no celular). Filtros ativos aparecem como etiquetas removíveis.
 - **Ao filtrar/reordenar**: escolha entre grade simples, manter a escala sem banners (padrão) ou manter tudo.
-- **Carregamento**: botão "carregar mais" (padrão), automático ao rolar ou páginas numeradas.
+- **Carregamento infinito**: novos produtos entram automaticamente conforme a cliente rola (sem botão).
 - **Voltar do produto**: os produtos já carregados e a posição de rolagem são restaurados.
 
 ## Produto
@@ -51,7 +51,7 @@ Seção **Vitrine de recomendações**, abaixo das informações da peça. Carre
 3. Até 2 coleções do produto (ignorando as listadas em "Coleções a ignorar")
 4. Coleção reserva (opcional) e, por fim, todos os produtos
 
-Sem repetições e sem os itens de "Compre o look". Depois de N carregamentos automáticos (padrão 3) aparece o botão "carregar mais", garantindo acesso ao rodapé. Ao abrir uma sugestão e voltar, a vitrine e a posição de rolagem são restauradas.
+Sem repetições e sem os itens de "Compre o look". O carregamento é infinito, sem botão, até o limite de "Máximo de produtos" (padrão 60); depois disso o rodapé aparece. Ao abrir uma sugestão e voltar, a vitrine e a posição de rolagem são restauradas.
 
 ## Metafields a criar (Configurações → Dados personalizados → Produtos)
 

@@ -85,7 +85,6 @@
       data-sources="{{ sources | escape }}"
       data-exclude="{{ exclude_ids }}"
       data-max-items="{{ section.settings.max_products }}"
-      data-auto-loads="{{ section.settings.auto_loads }}"
       data-memory-key="feed:{{ product.handle }}"
       data-collection-section="product-feed"
     >
@@ -94,7 +93,6 @@
         {%- for i in (1..4) -%}<div class="feed__ghost"></div>{%- endfor -%}
       </div>
       <div class="load-more">
-        <button type="button" class="button button--outline" data-feed-more hidden>{{ 'products.feed.load_more' | t }}</button>
         <div class="load-more__sentinel" data-sentinel aria-hidden="true"></div>
       </div>
     </product-feed>
@@ -113,7 +111,6 @@
     { "type": "collection", "id": "fallback_collection", "label": "Coleção reserva" },
     { "type": "range", "id": "products_per_load", "label": "Produtos por carregamento", "min": 8, "max": 24, "step": 4, "default": 12 },
     { "type": "range", "id": "max_products", "label": "Máximo de produtos", "min": 12, "max": 120, "step": 4, "default": 60 },
-    { "type": "range", "id": "auto_loads", "label": "Carregamentos automáticos", "info": "Depois disso aparece o botão \"carregar mais\", liberando o acesso ao rodapé", "min": 0, "max": 10, "step": 1, "default": 3 },
     {
       "type": "select",
       "id": "columns_desktop",

@@ -279,7 +279,6 @@
     {%- if collection.products.size > 0 -%}
       <infinite-grid
         class="ed-grid ed-grid--{{ grid_mode }} ed-grid--desktop-{{ section.settings.columns_desktop }}"
-        data-mode="{{ section.settings.pagination_mode }}"
         data-next-url="{{ paginate.next.url }}"
         data-section-id="{{ section.id }}"
         data-memory-key="collection:{{ collection.handle }}:{{ request.path }}"
@@ -367,20 +366,16 @@
         </div>
 
         {%- if paginate.pages > 1 -%}
-          {%- if section.settings.pagination_mode == 'pages' -%}
-            {% render 'pagination', paginate: paginate %}
-          {%- else -%}
-            <div class="load-more" data-load-more-wrapper>
+          <div class="load-more" data-load-more-wrapper>
               {%- assign shown_count = offset | plus: collection.products.size -%}
               <p class="load-more__count" data-load-more-count>
                 {{ 'collections.general.showing' | t: shown: shown_count, total: collection.products_count }}
               </p>
               {%- if paginate.next -%}
-                <a href="{{ paginate.next.url }}" class="button button--outline" data-load-more>{{ 'collections.general.load_more' | t }}</a>
+                <a href="{{ paginate.next.url }}" class="button button--outline load-more__fallback" data-load-more>{{ 'collections.general.load_more' | t }}</a>
               {%- endif -%}
               <div class="load-more__sentinel" data-sentinel aria-hidden="true"></div>
             </div>
-          {%- endif -%}
         {%- endif -%}
       </infinite-grid>
     {%- else -%}
@@ -421,17 +416,6 @@
         { "value": "keep", "label": "Manter composição completa" }
       ],
       "default": "no_banners"
-    },
-    {
-      "type": "select",
-      "id": "pagination_mode",
-      "label": "Carregamento de produtos",
-      "options": [
-        { "value": "button", "label": "Botão \"carregar mais\"" },
-        { "value": "infinite", "label": "Automático ao rolar" },
-        { "value": "pages", "label": "Páginas numeradas" }
-      ],
-      "default": "button"
     },
     { "type": "checkbox", "id": "show_description", "label": "Mostrar descrição da coleção", "default": false },
     { "type": "header", "content": "Abas de categorias" },

@@ -25,7 +25,6 @@
         "use_complementary": true,
         "products_per_load": 12,
         "max_products": 60,
-        "auto_loads": 3,
         "columns_desktop": "5",
         "show_sold_out": false
       }

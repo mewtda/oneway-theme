@@ -516,6 +516,9 @@
     return observer;
   };
 
+  const sentinelNearViewport = (sentinel) =>
+    sentinel && sentinel.isConnected && sentinel.getBoundingClientRect().top < window.innerHeight + 600;
+
   /* ---------- Grade da coleção: carregar mais / rolagem contínua ---------- */
   class InfiniteGrid extends HTMLElement {
     connectedCallback() {
@@ -528,13 +531,11 @@
 
       if (ScrollMemory.shouldRestore()) this.restore();
 
-      this.button?.addEventListener('click', (event) => {
-        event.preventDefault();
-        this.loadNext();
-      });
-      if (this.dataset.mode === 'infinite') {
-        this.observer = onIntersect(this.querySelector('[data-sentinel]'), () => this.loadNext());
-      }
+      /* Carregamento sempre infinito: o link fica só como alternativa sem JavaScript */
+      this.button?.remove();
+      this.button = null;
+      this.sentinel = this.querySelector('[data-sentinel]');
+      this.observer = onIntersect(this.sentinel, () => this.loadNext());
       this.addEventListener('click', (event) => {
         if (event.target.closest('a[href]')) this.save();
       });
@@ -575,7 +576,7 @@
     async loadNext() {
       if (this.loading || !this.nextUrl) return;
       this.loading = true;
-      this.button?.classList.add('is-loading');
+      this.classList.add('is-loading');
       try {
         const url = new URL(this.nextUrl, window.location.origin);
         url.searchParams.set('section_id', this.dataset.sectionId);
@@ -589,10 +590,12 @@
         this.updateButton();
       } catch (error) {
         console.error(error);
+        this.nextUrl = '';
       } finally {
         this.loading = false;
-        this.button?.classList.remove('is-loading');
+        this.classList.remove('is-loading');
       }
+      if (sentinelNearViewport(this.sentinel)) this.loadNext();
     }
   }
   customElements.define('infinite-grid', InfiniteGrid);
@@ -602,10 +605,9 @@
     connectedCallback() {
       this.grid = this.querySelector('[data-feed-grid]');
       this.skeleton = this.querySelector('[data-feed-skeleton]');
-      this.button = this.querySelector('[data-feed-more]');
+      this.sentinel = this.querySelector('[data-sentinel]');
       this.sources = (this.dataset.sources || '').split('|').filter(Boolean);
       this.maxItems = Number(this.dataset.maxItems || 60);
-      this.autoLoads = Number(this.dataset.autoLoads || 0);
       this.key = this.dataset.memoryKey;
       this.state = { source: 0, page: 1, loads: 0, seen: (this.dataset.exclude || '').split(',').filter(Boolean) };
       this.loading = false;
@@ -616,9 +618,8 @@
         onIntersect(this, () => this.state.loads === 0 && this.load(), '400px 0px');
       }
 
-      this.button.addEventListener('click', () => this.load(true));
-      this.observer = onIntersect(this.querySelector('[data-sentinel]'), () => {
-        if (this.state.loads > 0 && this.state.loads < this.autoLoads) this.load();
+      this.observer = onIntersect(this.sentinel, () => {
+        if (this.state.loads > 0) this.load();
       });
       document.addEventListener('click', (event) => {
         const link = event.target.closest('a[href]');
@@ -644,7 +645,6 @@
       this.grid.innerHTML = data.html;
       this.state = data.state;
       this.skeleton?.remove();
-      this.updateButton();
       ScrollMemory.restoreScroll(data.y);
       return true;
     }
@@ -675,10 +675,10 @@
       return { items: [...(wrapper?.querySelectorAll('[data-feed-item]') || [])], next: wrapper?.dataset.nextPage || '' };
     }
 
-    async load(manual = false) {
+    async load() {
       if (this.loading || this.done) return;
       this.loading = true;
-      this.button.classList.add('is-loading');
+      this.classList.add('is-loading');
       const target = Math.min(this.grid.children.length + 8, this.maxItems);
 
       try {
@@ -699,15 +699,10 @@
         this.loading = false;
         this.skeleton?.remove();
         this.skeleton = null;
-        this.button.classList.remove('is-loading');
+        this.classList.remove('is-loading');
         if (!this.grid.children.length) this.closest('.feed')?.setAttribute('hidden', '');
-        this.updateButton();
       }
-      if (manual) this.grid.lastElementChild?.querySelector('a')?.focus({ preventScroll: true });
-    }
-
-    updateButton() {
-      this.button.hidden = this.done || this.state.loads < this.autoLoads;
+      if (!this.done && sentinelNearViewport(this.sentinel)) this.load();
     }
   }
   customElements.define('product-feed', ProductFeed);

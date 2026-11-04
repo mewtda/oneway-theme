@@ -72,7 +72,6 @@
         "columns_desktop": "4",
         "repeat_banners": false,
         "filtered_layout": "no_banners",
-        "pagination_mode": "button",
         "show_description": false,
         "category_parent": "Categorias",
         "category_menu": "",
