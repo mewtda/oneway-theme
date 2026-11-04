@@ -19,7 +19,7 @@
     },
     "header": {
       "type": "header",
-      "settings": { "menu": "main-menu", "mobile_nav": true, "background_style": "transparent", "blur_opacity": 70, "overlay_text_color": "#FFFFFF", "sticky": true, "show_localization": false }
+      "settings": { "menu": "main-menu", "background_style": "transparent", "blur_opacity": 70, "overlay_text_color": "#FFFFFF", "sticky": true, "show_localization": false }
     }
   },
   "order": ["announcement-bar", "header"]

@@ -19,7 +19,7 @@
 -%}
 {%- capture whatsapp_url -%}{% render 'whatsapp-url' %}{%- endcapture -%}
 <header
-  class="site-header site-header--stacked site-header--bg-{{ bg_style }}{% if section.settings.sticky %} site-header--sticky{% endif %}{% if overlay %} site-header--overlay is-transparent{% endif %}{% if section.settings.mobile_nav %} site-header--mobile-nav{% endif %}{% if overlay_brightness > 150 %} site-header--invert-logo{% endif %}"
+  class="site-header site-header--stacked site-header--bg-{{ bg_style }}{% if section.settings.sticky %} site-header--sticky{% endif %}{% if overlay %} site-header--overlay is-transparent{% endif %}{% if overlay_brightness > 150 %} site-header--invert-logo{% endif %}"
   style="--header-overlay-text: {{ section.settings.overlay_text_color }}; --header-blur-alpha: {{ section.settings.blur_opacity | divided_by: 100.0 }}; --header-bg-rgb: {{ settings.color_background.red }}, {{ settings.color_background.green }}, {{ settings.color_background.blue }};"
   data-header
 >
@@ -265,7 +265,6 @@
   "class": "section-site-header",
   "settings": [
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
-    { "type": "checkbox", "id": "mobile_nav", "label": "Mostrar menu embaixo do logo no celular", "info": "Linha com os itens principais, com rolagem lateral", "default": true },
     { "type": "header", "content": "Fundo" },
     {
       "type": "select",
