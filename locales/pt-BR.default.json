@@ -111,7 +111,9 @@
       "size_guide": "Guia de tamanhos",
       "model_wears": "A modelo veste {{ size }}",
       "description": "Descrição",
-      "installments": "ou {{ count }}x de {{ value }} sem juros"
+      "installments": "ou {{ count }}x de {{ value }} sem juros",
+      "zoom": "Ampliar foto",
+      "zoom_hint": "Toque na foto para ampliar"
     },
     "feed": {
       "load_more": "Carregar mais"

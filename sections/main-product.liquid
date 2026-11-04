@@ -33,7 +33,9 @@
               {%- if forloop.index <= 2 -%}{%- assign loading = 'eager' -%}{%- endif -%}
               {%- assign priority = 'auto' -%}
               {%- if forloop.first -%}{%- assign priority = 'high' -%}{%- endif -%}
-              {{ media | image_url: width: 2000 | image_tag: loading: loading, fetchpriority: priority, widths: '500, 750, 1000, 1300, 1600, 2000', sizes: '(min-width: 990px) 33vw, 100vw', alt: media.alt | default: product.title }}
+              <button type="button" class="product__zoom-trigger" data-zoom-open="{{ media.id }}" aria-label="{{ 'products.product.zoom' | t }}">
+                {{ media | image_url: width: 2000 | image_tag: loading: loading, fetchpriority: priority, widths: '500, 750, 1000, 1300, 1600, 2000', sizes: '(min-width: 990px) 33vw, 100vw', alt: media.alt | default: product.title }}
+              </button>
             {%- when 'video' -%}
               {{ media | video_tag: autoplay: true, loop: true, muted: true, controls: false, playsinline: true, preload: 'metadata', image_size: '1600x' }}
             {%- when 'external_video' -%}
@@ -313,6 +315,30 @@
       </div>
     </sticky-buy-bar>
   {%- endif -%}
+
+  {%- if section.settings.enable_zoom and product_images.size > 0 -%}
+    <product-zoom class="zoom" id="Zoom-{{ section.id }}" role="dialog" aria-modal="true" aria-label="{{ 'products.product.zoom' | t }}" aria-hidden="true">
+      <div class="zoom__bar">
+        <span class="zoom__counter"><span data-zoom-current>1</span> / {{ product_images.size }}</span>
+        <button type="button" class="zoom__close" data-zoom-close>
+          {%- render 'icon', name: 'close' -%}
+          <span class="visually-hidden">{{ 'general.close' | t }}</span>
+        </button>
+      </div>
+      <div class="zoom__track" data-zoom-track>
+        {%- for image in product_images -%}
+          <div class="zoom__slide" data-zoom-slide data-media-id="{{ image.id }}">
+            {{ image | image_url: width: 3000 | image_tag: loading: 'lazy', widths: '1000, 1500, 2000, 2500, 3000', sizes: '(min-width: 990px) 100vw, 250vw', class: 'zoom__image', alt: image.alt | default: product.title, draggable: 'false' }}
+          </div>
+        {%- endfor -%}
+      </div>
+      {%- if product_images.size > 1 -%}
+        <button type="button" class="zoom__arrow zoom__arrow--prev" data-zoom-prev aria-label="{{ 'products.product.previous_image' | t }}">{% render 'icon', name: 'arrow-left' %}</button>
+        <button type="button" class="zoom__arrow zoom__arrow--next" data-zoom-next aria-label="{{ 'products.product.next_image' | t }}">{% render 'icon', name: 'arrow-right' %}</button>
+      {%- endif -%}
+      <p class="zoom__hint">{{ 'products.product.zoom_hint' | t }}</p>
+    </product-zoom>
+  {%- endif -%}
 </section>
 
 <script type="application/ld+json">
@@ -325,7 +351,8 @@
   "class": "section-main-product",
   "settings": [
     { "type": "checkbox", "id": "videos_first", "label": "Mostrar vídeos antes das fotos", "default": false },
-    { "type": "checkbox", "id": "sticky_bar", "label": "Barra de compra fixa ao rolar", "default": true }
+    { "type": "checkbox", "id": "sticky_bar", "label": "Barra de compra fixa ao rolar", "default": true },
+    { "type": "checkbox", "id": "enable_zoom", "label": "Zoom nas fotos", "info": "Toque ou clique na foto para abrir em tela cheia e ampliar", "default": true }
   ],
   "blocks": [
     { "type": "@app" },

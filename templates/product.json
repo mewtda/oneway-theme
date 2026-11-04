@@ -16,7 +16,7 @@
         "share": { "type": "share", "settings": {} }
       },
       "block_order": ["title", "price", "variant_picker", "size_guide", "model_info", "buy_buttons", "description", "tab-composition", "tab-shipping", "shop_the_look", "share"],
-      "settings": { "videos_first": false, "sticky_bar": true }
+      "settings": { "videos_first": false, "sticky_bar": true, "enable_zoom": true }
     },
     "feed": {
       "type": "product-feed",

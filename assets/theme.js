@@ -772,6 +772,115 @@
     update();
   };
 
+  /* ---------- Zoom das fotos do produto ----------
+     Abre em tela cheia; toque/clique amplia no ponto tocado (2,5x).
+     Ampliada: arrastar/rolar move a foto no celular, o mouse move no desktop. */
+  class ProductZoom extends HTMLElement {
+    connectedCallback() {
+      this.track = this.querySelector('[data-zoom-track]');
+      this.slides = [...this.querySelectorAll('[data-zoom-slide]')];
+      this.current = this.querySelector('[data-zoom-current]');
+      this.section = this.closest('[data-section-id]');
+      this.scale = 2.5;
+
+      this.section?.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-zoom-open]');
+        if (!trigger) return;
+        this.opener = trigger;
+        this.open(trigger.dataset.zoomOpen);
+      });
+      this.querySelector('[data-zoom-close]').addEventListener('click', () => this.close());
+      this.querySelector('[data-zoom-prev]')?.addEventListener('click', () => this.go(this.index - 1));
+      this.querySelector('[data-zoom-next]')?.addEventListener('click', () => this.go(this.index + 1));
+      this.track.addEventListener('scroll', () => this.updateCounter(), { passive: true });
+
+      this.slides.forEach((slide) => {
+        let start = null;
+        slide.addEventListener('pointerdown', (event) => (start = { x: event.clientX, y: event.clientY }));
+        slide.addEventListener('click', (event) => {
+          const moved = start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8;
+          if (!moved) this.toggleZoom(slide, event);
+        });
+        slide.addEventListener('mousemove', (event) => {
+          if (!slide.classList.contains('is-zoomed') || !window.matchMedia('(hover: hover)').matches) return;
+          const rect = slide.getBoundingClientRect();
+          slide.scrollLeft = ((event.clientX - rect.left) / rect.width) * (slide.scrollWidth - rect.width);
+          slide.scrollTop = ((event.clientY - rect.top) / rect.height) * (slide.scrollHeight - rect.height);
+        });
+      });
+
+      this.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') this.close();
+        if (event.key === 'ArrowRight') this.go(this.index + 1);
+        if (event.key === 'ArrowLeft') this.go(this.index - 1);
+      });
+    }
+
+    get index() {
+      return Math.round(this.track.scrollLeft / this.track.clientWidth);
+    }
+
+    open(mediaId) {
+      const position = Math.max(0, this.slides.findIndex((slide) => slide.dataset.mediaId === mediaId));
+      this.slides.forEach((slide) => slide.querySelector('img')?.setAttribute('loading', 'eager'));
+      this.classList.add('is-open');
+      this.setAttribute('aria-hidden', 'false');
+      lockScroll(true);
+      this.track.scrollTo({ left: position * this.track.clientWidth, behavior: 'instant' });
+      this.updateCounter();
+      this.querySelector('[data-zoom-close]').focus();
+    }
+
+    close() {
+      if (!this.classList.contains('is-open')) return;
+      this.slides.forEach((slide) => this.unzoom(slide));
+      this.classList.remove('is-open');
+      this.setAttribute('aria-hidden', 'true');
+      lockScroll(false);
+      this.opener?.focus({ preventScroll: true });
+    }
+
+    go(position) {
+      const target = Math.max(0, Math.min(this.slides.length - 1, position));
+      this.slides.forEach((slide) => this.unzoom(slide));
+      this.track.scrollTo({ left: target * this.track.clientWidth, behavior: 'smooth' });
+    }
+
+    updateCounter() {
+      if (this.current) this.current.textContent = this.index + 1;
+    }
+
+    unzoom(slide) {
+      if (!slide.classList.contains('is-zoomed')) return;
+      slide.classList.remove('is-zoomed');
+      slide.style.removeProperty('--zoom-width');
+      this.classList.remove('is-zoomed');
+      slide.scrollTo(0, 0);
+    }
+
+    toggleZoom(slide, event) {
+      if (slide.classList.contains('is-zoomed')) {
+        this.unzoom(slide);
+        return;
+      }
+      const image = slide.querySelector('img');
+      if (!image) return;
+      const rect = image.getBoundingClientRect();
+      const slideRect = slide.getBoundingClientRect();
+      const ratioX = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+      const ratioY = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+
+      slide.style.setProperty('--zoom-width', `${rect.width * this.scale}px`);
+      slide.classList.add('is-zoomed');
+      this.classList.add('is-zoomed');
+      requestAnimationFrame(() => {
+        slide.scrollLeft = ratioX * slide.scrollWidth - (event.clientX - slideRect.left);
+        slide.scrollTop = ratioY * slide.scrollHeight - (event.clientY - slideRect.top);
+      });
+    }
+  }
+  customElements.define('product-zoom', ProductZoom);
+
   window.theme.templateName = document.body.className.match(/template-([\w-]+)/)?.[1];
 
   setupHeader();
