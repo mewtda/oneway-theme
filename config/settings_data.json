@@ -1,5 +1,51 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-  "current": "Default",
+  "current": {
+    "logo": "shopify://shop_images/email-2024.png",
+    "logo_inverse": "shopify://shop_images/Ativo_23_3x_aed55ea8-96f3-4bf6-a4f8-070729f2549d.png",
+    "logo_width": 130,
+    "color_background": "#FFFFFF",
+    "color_background_alt": "#F3F3F3",
+    "color_text": "#121212",
+    "color_accent": "#121212",
+    "color_accent_text": "#FFFFFF",
+    "color_sale": "#B3261E",
+    "color_announcement_bg": "#F3F3F3",
+    "color_announcement_text": "#121212",
+    "color_footer_bg": "#FFFFFF",
+    "color_footer_text": "#121212",
+    "font_body": "inter_n4",
+    "font_heading": "inter_n4",
+    "heading_uppercase": true,
+    "heading_letter_spacing": 4,
+    "page_width": 1680,
+    "card_image_ratio": "2 / 3",
+    "card_show_gallery": false,
+    "card_show_second_image": true,
+    "card_show_sizes": false,
+    "card_size_option_names": "Tamanho,Size,Talla",
+    "cart_type": "drawer",
+    "cart_show_note": false,
+    "free_shipping_threshold": 0,
+    "whatsapp_message": "Olá! Vim pelo site da One Way e gostaria de atendimento.",
+    "whatsapp_floating": false,
+    "whatsapp_floating_color": "#25D366",
+    "sections": {
+      "cart-drawer": {
+        "type": "cart-drawer",
+        "settings": {}
+      }
+    },
+    "content_for_index": []
+  },
   "presets": {
     "Default": {
       "logo_width": 130,
@@ -30,7 +76,10 @@
       "whatsapp_floating": false,
       "whatsapp_floating_color": "#25D366",
       "sections": {
-        "cart-drawer": { "type": "cart-drawer", "settings": {} }
+        "cart-drawer": {
+          "type": "cart-drawer",
+          "settings": {}
+        }
       }
     }
   }
