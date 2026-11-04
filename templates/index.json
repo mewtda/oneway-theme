@@ -42,6 +42,7 @@
         "party": {
           "type": "banner",
           "settings": {
+            "image": "shopify://shop_images/corcorrigidaIMG_9089.jpg",
             "collection": "",
             "eyebrow": "",
             "title": "Party Collection",
@@ -56,6 +57,7 @@
         "beachwear": {
           "type": "banner",
           "settings": {
+            "image": "shopify://shop_images/ONEWAYJUL260487.jpg",
             "collection": "",
             "eyebrow": "",
             "title": "Beachwear",
