@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
@@ -6,9 +15,11 @@
         "slide-1": {
           "type": "slide",
           "settings": {
-            "heading": "New Drop",
+            "image": "shopify://shop_images/banner_2_desk_shop_now.png",
+            "image_mobile": "shopify://shop_images/banner_2_shop_now_mobile.png",
+            "heading": "",
             "subheading": "",
-            "button_label": "Shop now",
+            "button_label": "",
             "link": "shopify://collections/novidades",
             "button_style": "light",
             "text_position": "center",
@@ -16,31 +27,89 @@
           }
         }
       },
-      "block_order": ["slide-1"],
-      "settings": { "height": "full", "autoplay": true, "speed": 6 }
+      "block_order": [
+        "slide-1"
+      ],
+      "settings": {
+        "height": "full",
+        "autoplay": true,
+        "speed": 6
+      }
     },
     "selections": {
       "type": "banner-entries",
       "blocks": {
         "party": {
           "type": "banner",
-          "settings": { "title": "Party Collection", "link": "shopify://collections/party", "button_label": "Ver seleção", "desktop_width": "half", "ratio_desktop": "4 / 5", "ratio_mobile": "4 / 5", "text_position": "bottom-center" }
+          "settings": {
+            "collection": "",
+            "eyebrow": "",
+            "title": "Party Collection",
+            "link": "shopify://collections/party",
+            "button_label": "Ver seleção",
+            "desktop_width": "half",
+            "ratio_desktop": "4 / 5",
+            "ratio_mobile": "4 / 5",
+            "text_position": "bottom-center"
+          }
         },
         "beachwear": {
           "type": "banner",
-          "settings": { "title": "Beachwear", "link": "shopify://collections/beachwear", "button_label": "Ver seleção", "desktop_width": "half", "ratio_desktop": "4 / 5", "ratio_mobile": "4 / 5", "text_position": "bottom-center" }
+          "settings": {
+            "collection": "",
+            "eyebrow": "",
+            "title": "Beachwear",
+            "link": "shopify://collections/beachwear",
+            "button_label": "Ver seleção",
+            "desktop_width": "half",
+            "ratio_desktop": "4 / 5",
+            "ratio_mobile": "4 / 5",
+            "text_position": "bottom-center"
+          }
         },
         "conjuntos": {
           "type": "banner",
-          "settings": { "title": "Conjuntos", "link": "shopify://collections/conjunto", "button_label": "Ver seleção", "desktop_width": "full", "ratio_desktop": "21 / 9", "ratio_mobile": "4 / 5", "text_position": "center" }
+          "settings": {
+            "collection": "",
+            "eyebrow": "",
+            "title": "Conjuntos",
+            "link": "shopify://collections/conjunto",
+            "button_label": "Ver seleção",
+            "desktop_width": "full",
+            "ratio_desktop": "21 / 9",
+            "ratio_mobile": "4 / 5",
+            "text_position": "center"
+          }
         },
         "acessorios": {
           "type": "banner",
-          "settings": { "title": "Acessórios", "link": "shopify://collections/acessorios", "button_label": "Ver seleção", "desktop_width": "half", "ratio_desktop": "4 / 5", "ratio_mobile": "4 / 5", "text_position": "bottom-center" }
+          "settings": {
+            "collection": "",
+            "eyebrow": "",
+            "title": "Acessórios",
+            "link": "shopify://collections/acessorios",
+            "button_label": "Ver seleção",
+            "desktop_width": "half",
+            "ratio_desktop": "4 / 5",
+            "ratio_mobile": "4 / 5",
+            "text_position": "bottom-center"
+          }
         }
       },
-      "block_order": ["party", "beachwear", "conjuntos", "acessorios"],
-      "settings": { "heading": "", "full_width": true, "gap": "small", "columns_mobile": "1", "text_color": "#FFFFFF", "overlay": 10 }
+      "block_order": [
+        "party",
+        "beachwear",
+        "conjuntos",
+        "acessorios"
+      ],
+      "settings": {
+        "heading": "",
+        "full_width": true,
+        "gap": "small",
+        "columns_mobile": "1",
+        "text_color": "#ffffff",
+        "overlay": 10
+      }
     },
     "new-in": {
       "type": "featured-collection",
@@ -54,5 +123,9 @@
       }
     }
   },
-  "order": ["hero", "selections", "new-in"]
+  "order": [
+    "hero",
+    "selections",
+    "new-in"
+  ]
 }
