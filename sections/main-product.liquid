@@ -53,11 +53,33 @@
       {%- endfor -%}
     </media-gallery>
     {%- if sorted_media.size > 1 -%}
-      <div class="product__media-dots" aria-hidden="true" data-media-dots>
+      <div class="product__media-dots{% if section.settings.mobile_thumbnails %} product__media-dots--with-thumbs{% endif %}" aria-hidden="true" data-media-dots>
         {%- for media in sorted_media -%}
           <span class="product__media-dot{% if forloop.first %} is-active{% endif %}"></span>
         {%- endfor -%}
       </div>
+      {%- if section.settings.mobile_thumbnails -%}
+        <ul class="product__thumbs" aria-label="{{ 'products.product.thumbnails' | t }}">
+          {%- for media in sorted_media -%}
+            <li>
+              <button
+                type="button"
+                class="product__thumb{% if forloop.first %} is-active{% endif %}"
+                data-thumb-index="{{ forloop.index0 }}"
+                aria-label="{{ 'products.product.go_to_image' | t: index: forloop.index }}"
+                {% if forloop.first %}aria-current="true"{% endif %}
+              >
+                {%- if media.preview_image -%}
+                  {{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80, 120, 160', sizes: '56px', alt: '' }}
+                {%- endif -%}
+                {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                  <span class="product__thumb-play" aria-hidden="true"></span>
+                {%- endif -%}
+              </button>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
     {%- endif -%}
   </div>
 
@@ -357,6 +379,7 @@
   "settings": [
     { "type": "checkbox", "id": "videos_first", "label": "Mostrar vídeos antes das fotos", "default": false },
     { "type": "checkbox", "id": "sticky_bar", "label": "Barra de compra fixa ao rolar", "default": true },
+    { "type": "checkbox", "id": "mobile_thumbnails", "label": "Miniaturas das fotos no celular", "info": "Fileira de fotos pequenas embaixo da foto principal; tocar leva até a foto", "default": true },
     { "type": "checkbox", "id": "enable_zoom", "label": "Zoom nas fotos", "info": "Toque ou clique na foto para abrir em tela cheia e ampliar", "default": true }
   ],
   "blocks": [

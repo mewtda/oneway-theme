@@ -92,7 +92,8 @@
       "settings": {
         "videos_first": false,
         "sticky_bar": true,
-        "enable_zoom": true
+        "enable_zoom": true,
+        "mobile_thumbnails": true
       }
     },
     "feed": {

@@ -4528,3 +4528,64 @@ a.color-swatch::before {
 .color-swatches--product:not(.is-loaded) .color-swatches__list {
   min-height: 1.5rem;
 }
+
+/* Miniaturas das fotos (celular): embaixo da foto, alinhadas à esquerda */
+.product__thumbs {
+  display: none;
+}
+
+@media (max-width: 989px) {
+  .product__media-dots--with-thumbs {
+    display: none;
+  }
+
+  .product__thumbs {
+    display: flex;
+    gap: 0.375rem;
+    overflow-x: auto;
+    padding: 0.5rem var(--page-gutter) 0;
+    scrollbar-width: none;
+  }
+
+  .product__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product__thumbs li {
+    flex-shrink: 0;
+  }
+
+  .product__thumb {
+    position: relative;
+    display: block;
+    width: 3.5rem;
+    aspect-ratio: var(--card-ratio);
+    overflow: hidden;
+    background: var(--color-background-alt);
+    opacity: 0.55;
+    transition: opacity 0.2s ease;
+  }
+
+  .product__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product__thumb.is-active {
+    opacity: 1;
+    outline: 1px solid var(--color-text);
+    outline-offset: -1px;
+  }
+
+  .product__thumb-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-style: solid;
+    border-width: 0.3125rem 0 0.3125rem 0.5rem;
+    border-color: transparent transparent transparent #fff;
+    transform: translate(-40%, -50%);
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+  }
+}

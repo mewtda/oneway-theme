@@ -116,7 +116,9 @@
       "zoom": "Ampliar foto",
       "zoom_hint": "Toque na foto para ampliar",
       "color": "Cor",
-      "other_colors": "Outras cores"
+      "other_colors": "Outras cores",
+      "thumbnails": "Fotos do produto",
+      "go_to_image": "Ver foto {{ index }}"
     },
     "feed": {
       "load_more": "Carregar mais"

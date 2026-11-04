@@ -710,12 +710,40 @@
   /* ---------- Galeria do produto: indicador no celular ---------- */
   class MediaGallery extends HTMLElement {
     connectedCallback() {
-      this.dots = [...(this.parentElement.querySelectorAll('.product__media-dot') || [])];
-      if (!this.dots.length) return;
-      this.addEventListener('scroll', () => {
-        const index = Math.round(this.scrollLeft / this.clientWidth);
-        this.dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
-      }, { passive: true });
+      const gallery = this.parentElement;
+      this.dots = [...gallery.querySelectorAll('.product__media-dot')];
+      this.thumbs = [...gallery.querySelectorAll('[data-thumb-index]')];
+      this.thumbList = gallery.querySelector('.product__thumbs');
+      if (!this.dots.length && !this.thumbs.length) return;
+
+      this.addEventListener('scroll', () => this.update(), { passive: true });
+      this.thumbs.forEach((thumb) => {
+        thumb.addEventListener('click', () => {
+          const index = Number(thumb.dataset.thumbIndex);
+          this.scrollTo({ left: index * this.clientWidth, behavior: 'smooth' });
+        });
+      });
+    }
+
+    update() {
+      const index = Math.round(this.scrollLeft / this.clientWidth);
+      if (index === this.current) return;
+      this.current = index;
+      this.dots.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+      this.thumbs.forEach((thumb, i) => {
+        const active = i === index;
+        thumb.classList.toggle('is-active', active);
+        if (active) {
+          thumb.setAttribute('aria-current', 'true');
+          const list = this.thumbList;
+          const left = thumb.offsetLeft - list.offsetLeft;
+          if (left < list.scrollLeft || left + thumb.offsetWidth > list.scrollLeft + list.clientWidth) {
+            list.scrollTo({ left: left - 8, behavior: 'smooth' });
+          }
+        } else {
+          thumb.removeAttribute('aria-current');
+        }
+      });
     }
   }
   customElements.define('media-gallery', MediaGallery);
