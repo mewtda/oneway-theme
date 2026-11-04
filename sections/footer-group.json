@@ -23,6 +23,22 @@
     "footer": {
       "type": "footer",
       "blocks": {
+        "service-help": {
+          "type": "service",
+          "settings": { "icon": "chat", "title": "Dúvidas?", "text": "Fale conosco", "link": "", "use_whatsapp": true, "new_tab": true }
+        },
+        "service-store": {
+          "type": "service",
+          "settings": { "icon": "pin", "title": "Nossa loja", "text": "Venha nos visitar", "link": "shopify://pages/a-marca", "use_whatsapp": false, "new_tab": false }
+        },
+        "service-policy": {
+          "type": "service",
+          "settings": { "icon": "shield", "title": "Política de compra", "text": "Confira nossos termos", "link": "shopify://pages/politica-de-compra", "use_whatsapp": false, "new_tab": false }
+        },
+        "service-exchange": {
+          "type": "service",
+          "settings": { "icon": "exchange", "title": "Mudou de ideia?", "text": "Trocas ou devoluções", "link": "https://lojaoneway.troque.app.br/", "use_whatsapp": false, "new_tab": true }
+        },
         "contact": {
           "type": "contact",
           "settings": {
@@ -48,6 +64,10 @@
         }
       },
       "block_order": [
+        "service-help",
+        "service-store",
+        "service-policy",
+        "service-exchange",
         "contact",
         "legal",
         "account"

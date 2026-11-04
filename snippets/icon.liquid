@@ -1,12 +1,18 @@
 {% doc %}
   Renders an inline SVG icon.
 
-  @param {string} name - Icon name: filter, mail, percent, shield-lock, shield-check, lock, truck, tag, card, exchange, whatsapp, store, search, account, cart, menu, close, arrow-left, arrow-right, chevron-down, plus, minus, instagram, tiktok, facebook, youtube, pinterest
+  @param {string} name - Icon name: chat, pin, shield, filter, mail, percent, shield-lock, shield-check, lock, truck, tag, card, exchange, whatsapp, store, search, account, cart, menu, close, arrow-left, arrow-right, chevron-down, plus, minus, instagram, tiktok, facebook, youtube, pinterest
 
   @example
   {% render 'icon', name: 'cart' %}
 {% enddoc %}
 {%- case name -%}
+  {%- when 'chat' -%}
+    <svg class="icon icon-chat" aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  {%- when 'pin' -%}
+    <svg class="icon icon-pin" aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+  {%- when 'shield' -%}
+    <svg class="icon icon-shield" aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
   {%- when 'filter' -%}
     <svg class="icon icon-filter" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
   {%- when 'search' -%}
