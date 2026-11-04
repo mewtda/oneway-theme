@@ -247,8 +247,34 @@
         "type": "number",
         "id": "free_shipping_threshold",
         "label": "Frete grátis a partir de (R$)",
-        "info": "0 esconde a barra de progresso do carrinho",
+        "info": "Mostra a meta de frete grátis no carrinho. 0 esconde a barra",
         "default": 499
+      },
+      {
+        "type": "header",
+        "content": "Recomendações no carrinho"
+      },
+      {
+        "type": "range",
+        "id": "cart_recs_limit",
+        "label": "Quantidade de produtos",
+        "info": "0 esconde as recomendações",
+        "min": 0,
+        "max": 8,
+        "step": 1,
+        "default": 4
+      },
+      {
+        "type": "text",
+        "id": "cart_recs_heading",
+        "label": "Título",
+        "default": "Complete o look"
+      },
+      {
+        "type": "collection",
+        "id": "cart_recs_collection",
+        "label": "Coleção de origem",
+        "info": "Ex.: Acessórios ou Mais vendidos. Vazio = todos os produtos. Nunca sugere o mesmo tipo de produto que já está no carrinho"
       }
     ]
   },

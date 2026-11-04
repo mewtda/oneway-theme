@@ -1,12 +1,13 @@
 {% doc %}
   Renders complementary products for the cart: never the same product type as any item already in the cart.
 
-  @param {number} [limit] - Maximum products to show, defaults to 4
+  @param {number} [limit] - Maximum products to show, defaults to the cart_recs_limit theme setting
 
   @example
   {% render 'cart-recommendations', limit: 4 %}
 {% enddoc %}
-{%- if cart.item_count > 0 -%}
+{%- assign recs_limit = limit | default: settings.cart_recs_limit -%}
+{%- if recs_limit > 0 -%}
   {%- liquid
     assign cart_types = ''
     assign cart_ids = ''
@@ -15,14 +16,13 @@
       assign cart_types = cart_types | append: item_type | append: '|'
       assign cart_ids = cart_ids | append: item.product_id | append: '|'
     endfor
-    assign recs_limit = limit | default: 4
     capture cross_sell
-      render 'cross-sell', exclude_types: cart_types, exclude_ids: cart_ids, limit: recs_limit, layout: 'compact'
+      render 'cross-sell', exclude_types: cart_types, exclude_ids: cart_ids, limit: recs_limit, layout: 'compact', source: settings.cart_recs_collection
     endcapture
   -%}
   {%- if cross_sell != blank -%}
     <div class="cart-recs">
-      <p class="cart-recs__title">{{ 'sections.cart.recommendations' | t }}</p>
+      <p class="cart-recs__title">{%- if settings.cart_recs_heading != blank -%}{{ settings.cart_recs_heading }}{%- else -%}{{ 'sections.cart.recommendations' | t }}{%- endif -%}</p>
       <ul class="cart-recs__list">
         {{ cross_sell }}
       </ul>

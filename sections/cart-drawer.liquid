@@ -12,15 +12,19 @@
       {% render 'free-shipping-bar' %}
       <div class="cart-drawer__body">
         {% render 'cart-items' %}
-        {% render 'cart-recommendations', limit: 4 %}
+        {% render 'cart-recommendations' %}
       </div>
       <div class="cart-drawer__footer">
         {% render 'cart-summary' %}
       </div>
     {%- else -%}
-      <div class="cart-drawer__empty">
-        <p>{{ 'sections.cart.empty' | t }}</p>
-        <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'sections.cart.continue_shopping' | t }}</a>
+      {% render 'free-shipping-bar' %}
+      <div class="cart-drawer__body">
+        <div class="cart-drawer__empty">
+          <p>{{ 'sections.cart.empty' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'sections.cart.continue_shopping' | t }}</a>
+        </div>
+        {% render 'cart-recommendations' %}
       </div>
     {%- endif -%}
   </div>

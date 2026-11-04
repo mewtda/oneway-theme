@@ -4444,3 +4444,12 @@ a.footer-service__link:hover {
     display: none;
   }
 }
+
+/* Carrinho vazio: mensagem + meta de frete + recomendações */
+.cart-drawer__body .cart-drawer__empty {
+  padding: 3rem 1rem 2rem;
+}
+
+.free-shipping__message strong {
+  font-weight: 600;
+}

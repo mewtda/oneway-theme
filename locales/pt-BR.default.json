@@ -87,8 +87,9 @@
       "recommendations": "Você também vai curtir",
       "quick_add": "Adicionar",
       "free_shipping_label": "Progresso para frete grátis",
-      "free_shipping_remaining_html": "Faltam <strong>{{ amount }}</strong> para você ganhar <strong>frete grátis</strong>",
-      "free_shipping_reached_html": "Parabéns! Você ganhou <strong>frete grátis</strong>"
+      "free_shipping_remaining_html": "Faltam <strong>{{ amount }}</strong> para o <strong>frete grátis</strong>",
+      "free_shipping_reached_html": "Você ganhou <strong>frete grátis</strong>",
+      "free_shipping_goal_html": "<strong>Frete grátis</strong> nas compras acima de {{ amount }}"
     }
   },
   "products": {
