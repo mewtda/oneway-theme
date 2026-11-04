@@ -1,0 +1,39 @@
+{%- if section.blocks.size > 0 -%}
+  <div class="announcement-bar" role="region" aria-label="{{ 'sections.announcement.label' | t }}">
+    <announcement-slider class="announcement-bar__slider" data-speed="{{ section.settings.speed }}">
+      {%- for block in section.blocks -%}
+        <p class="announcement-bar__message{% if forloop.first %} is-active{% endif %}" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+          {%- else -%}
+            {{ block.settings.text }}
+          {%- endif -%}
+        </p>
+      {%- endfor -%}
+    </announcement-slider>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Barra de anúncio",
+  "class": "section-announcement",
+  "max_blocks": 5,
+  "settings": [
+    { "type": "range", "id": "speed", "label": "Troca a cada", "min": 3, "max": 10, "step": 1, "unit": "s", "default": 5 }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Anúncio",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Texto", "default": "Frete grátis acima de R$ 499" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Barra de anúncio", "blocks": [{ "type": "announcement" }] }
+  ]
+}
+{% endschema %}

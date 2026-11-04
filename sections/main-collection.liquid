@@ -1,0 +1,464 @@
+{%- liquid
+  assign per_page = section.settings.products_per_page
+
+  # Filtro ou ordenação ativos mudam a composição conforme a configuração
+  assign is_filtered = false
+  for filter in collection.filters
+    if filter.active_values.size > 0 or filter.min_value.value or filter.max_value.value
+      assign is_filtered = true
+    endif
+  endfor
+  assign has_active_filters = is_filtered
+  assign current_sort = collection.sort_by | default: collection.default_sort_by
+  if collection.sort_by != blank and collection.sort_by != collection.default_sort_by
+    assign is_filtered = true
+  endif
+
+  assign use_editorial = true
+  assign show_editorials = true
+  if is_filtered
+    if section.settings.filtered_layout == 'simple'
+      assign use_editorial = false
+      assign show_editorials = false
+    elsif section.settings.filtered_layout == 'no_banners'
+      assign show_editorials = false
+    endif
+  endif
+
+  # Monta a sequência de "slots" de produto a partir dos blocos:
+  #   s = produto pequeno, f = produto em destaque
+  # e a posição de cada banner editorial (antes de qual slot ele aparece)
+  assign slot_types = ''
+  assign slot_blocks = ''
+  assign editorial_map = ''
+  assign slot_count = 0
+  for block in section.blocks
+    case block.type
+      when 'pair'
+        assign slot_types = slot_types | append: 's,s,'
+        assign slot_blocks = slot_blocks | append: forloop.index0 | append: ',' | append: forloop.index0 | append: ','
+        assign slot_count = slot_count | plus: 2
+      when 'quad'
+        for i in (1..4)
+          assign slot_types = slot_types | append: 's,'
+          assign slot_blocks = slot_blocks | append: forloop.parentloop.index0 | append: ','
+        endfor
+        assign slot_count = slot_count | plus: 4
+      when 'row'
+        assign row_size = block.settings.count | plus: 0
+        for i in (1..row_size)
+          assign slot_types = slot_types | append: 's,'
+          assign slot_blocks = slot_blocks | append: forloop.parentloop.index0 | append: ','
+        endfor
+        assign slot_count = slot_count | plus: row_size
+      when 'featured'
+        assign slot_types = slot_types | append: 'f,'
+        assign slot_blocks = slot_blocks | append: forloop.index0 | append: ','
+        assign slot_count = slot_count | plus: 1
+      when 'editorial'
+        assign editorial_map = editorial_map | append: slot_count | append: ':' | append: forloop.index0 | append: ','
+    endcase
+  endfor
+  assign slot_types = slot_types | split: ','
+  assign slot_blocks = slot_blocks | split: ','
+  assign editorials = editorial_map | split: ','
+  if slot_count == 0
+    assign use_editorial = false
+  endif
+-%}
+
+{%- paginate collection.products by per_page -%}
+  {%- liquid
+    assign offset = paginate.current_page | minus: 1 | times: per_page
+    assign grid_mode = 'simple'
+    if use_editorial
+      assign grid_mode = 'editorial'
+    endif
+  -%}
+  <section class="collection" data-section-id="{{ section.id }}">
+    <div class="collection__header page-width">
+      <h1 class="collection__title">{{ collection.title }}</h1>
+      {%- if section.settings.show_description and collection.description != blank -%}
+        <div class="collection__description rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+
+    {%- liquid
+      assign category_links = section.settings.category_menu.links
+      if category_links == blank or category_links.size == 0
+        assign parent_title = section.settings.category_parent | downcase | strip
+        for top_link in linklists['main-menu'].links
+          assign top_title = top_link.title | downcase | strip
+          if top_title == parent_title
+            assign category_links = top_link.links
+            break
+          endif
+        endfor
+      endif
+    -%}
+    {%- if category_links.size > 0 -%}
+      <nav class="collection__categories page-width" aria-label="{{ section.settings.category_parent | escape }}">
+        <ul class="category-tabs">
+          {%- for category in category_links -%}
+            {%- liquid
+              assign is_current = false
+              if category.active or category.url == collection.url or category.object.id == collection.id
+                assign is_current = true
+              endif
+            -%}
+            <li>
+              <a href="{{ category.url }}" class="category-tab{% if is_current %} is-active{% endif %}"{% if is_current %} aria-current="page"{% endif %}>
+                {{- category.title | strip -}}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    {%- assign show_toolbar = false -%}
+    {%- if section.settings.enable_filtering and collection.filters.size > 0 -%}{%- assign show_toolbar = true -%}{%- endif -%}
+    {%- if section.settings.enable_sorting -%}{%- assign show_toolbar = true -%}{%- endif -%}
+
+    {%- if show_toolbar -%}
+      <div class="collection-toolbar">
+        <div class="collection-toolbar__inner page-width">
+          <button type="button" class="collection-toolbar__button" data-drawer-open="FilterDrawer" aria-controls="FilterDrawer" aria-expanded="false">
+            {%- render 'icon', name: 'filter' -%}
+            <span>{{ 'collections.filters.title_and_sort' | t }}</span>
+            {%- assign active_count = 0 -%}
+            {%- for filter in collection.filters -%}
+              {%- assign active_count = active_count | plus: filter.active_values.size -%}
+              {%- if filter.min_value.value or filter.max_value.value -%}{%- assign active_count = active_count | plus: 1 -%}{%- endif -%}
+            {%- endfor -%}
+            {%- if active_count > 0 -%}<span class="collection-toolbar__badge">{{ active_count }}</span>{%- endif -%}
+          </button>
+          <span class="collection-toolbar__count">{{ 'collections.general.products_count' | t: count: collection.products_count }}</span>
+        </div>
+
+        {%- if has_active_filters -%}
+          <ul class="active-filters page-width" aria-label="{{ 'collections.filters.active' | t }}">
+            {%- for filter in collection.filters -%}
+              {%- for value in filter.active_values -%}
+                <li>
+                  <a href="{{ value.url_to_remove }}" class="active-filter">
+                    {{ value.label }} {% render 'icon', name: 'close' %}
+                    <span class="visually-hidden">{{ 'collections.filters.remove' | t }}</span>
+                  </a>
+                </li>
+              {%- endfor -%}
+              {%- if filter.type == 'price_range' -%}
+                {%- if filter.min_value.value or filter.max_value.value -%}
+                  <li>
+                    <a href="{{ filter.url_to_remove }}" class="active-filter">
+                      {{ filter.min_value.value | default: 0 | money_without_trailing_zeros }} – {{ filter.max_value.value | default: filter.range_max | money_without_trailing_zeros }}
+                      {% render 'icon', name: 'close' %}
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+            <li><a href="{{ collection.url }}?sort_by={{ current_sort }}" class="link-underline">{{ 'collections.filters.clear' | t }}</a></li>
+          </ul>
+        {%- endif -%}
+      </div>
+
+      <div class="drawer filter-drawer" id="FilterDrawer" aria-hidden="true" data-drawer>
+        <div class="drawer__overlay" data-drawer-close></div>
+        <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="FilterDrawerTitle">
+          <div class="drawer__header">
+            <h2 class="drawer__title" id="FilterDrawerTitle">{{ 'collections.filters.title_and_sort' | t }}</h2>
+            <button type="button" class="site-header__icon" data-drawer-close>
+              {%- render 'icon', name: 'close' -%}
+              <span class="visually-hidden">{{ 'general.close' | t }}</span>
+            </button>
+          </div>
+
+          <form class="drawer__body filter-form" data-collection-filters>
+            {%- if section.settings.enable_sorting -%}
+              <fieldset class="filter-group">
+                <legend class="filter-group__title">{{ 'collections.sorting.title' | t }}</legend>
+                <ul class="filter-group__list">
+                  {%- for option in collection.sort_options -%}
+                    <li>
+                      <label class="filter-option">
+                        <input type="radio" name="sort_by" value="{{ option.value }}"{% if option.value == current_sort %} checked{% endif %}>
+                        <span>{{ option.name }}</span>
+                      </label>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </fieldset>
+            {%- endif -%}
+
+            {%- if section.settings.enable_filtering -%}
+              {%- for filter in collection.filters -%}
+                <details class="filter-group filter-group--collapsible"{% if filter.active_values.size > 0 or forloop.first %} open{% endif %}>
+                  <summary class="filter-group__title">
+                    {{ filter.label }}
+                    {%- if filter.active_values.size > 0 %} ({{ filter.active_values.size }}){% endif %}
+                    {% render 'icon', name: 'plus' %}
+                  </summary>
+                  {%- case filter.type -%}
+                    {%- when 'list', 'boolean' -%}
+                      <ul class="filter-group__list{% if filter.presentation == 'swatch' %} filter-group__list--swatch{% endif %}">
+                        {%- for value in filter.values -%}
+                          {%- assign disabled = false -%}
+                          {%- if value.count == 0 and value.active == false -%}{%- assign disabled = true -%}{%- endif -%}
+                          <li>
+                            <label class="filter-option{% if disabled %} is-disabled{% endif %}">
+                              <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"{% if value.active %} checked{% endif %}{% if disabled %} disabled{% endif %}>
+                              {%- if filter.presentation == 'swatch' and value.swatch.color -%}
+                                <span class="filter-option__swatch" style="background: {{ value.swatch.color }};"></span>
+                              {%- endif -%}
+                              <span>{{ value.label }}</span>
+                              <small>({{ value.count }})</small>
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- when 'price_range' -%}
+                      <div class="filter-price">
+                        <label>
+                          <span>{{ 'collections.filters.from' | t }}</span>
+                          <input type="number" name="{{ filter.min_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100 }}" placeholder="0"{% if filter.min_value.value %} value="{{ filter.min_value.value | divided_by: 100 }}"{% endif %}>
+                        </label>
+                        <label>
+                          <span>{{ 'collections.filters.to' | t }}</span>
+                          <input type="number" name="{{ filter.max_value.param_name }}" min="0" max="{{ filter.range_max | divided_by: 100 }}" placeholder="{{ filter.range_max | divided_by: 100 }}"{% if filter.max_value.value %} value="{{ filter.max_value.value | divided_by: 100 }}"{% endif %}>
+                        </label>
+                      </div>
+                  {%- endcase -%}
+                </details>
+              {%- endfor -%}
+            {%- endif -%}
+          </form>
+
+          <div class="drawer__footer">
+            <a href="{{ collection.url }}" class="button button--outline">{{ 'collections.filters.clear' | t }}</a>
+            <button type="button" class="button" data-drawer-close>{{ 'collections.filters.see_results' | t: count: collection.products_count }}</button>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if collection.products.size > 0 -%}
+      <infinite-grid
+        class="ed-grid ed-grid--{{ grid_mode }} ed-grid--desktop-{{ section.settings.columns_desktop }}"
+        data-mode="{{ section.settings.pagination_mode }}"
+        data-next-url="{{ paginate.next.url }}"
+        data-section-id="{{ section.id }}"
+        data-memory-key="collection:{{ collection.handle }}:{{ request.path }}"
+      >
+        <div class="ed-grid__items" data-grid-items>
+          {%- for product in collection.products -%}
+            {%- liquid
+              assign global_index = offset | plus: forloop.index0
+              assign slot_type = 's'
+              assign block_settings = null
+              assign cycle = 0
+              if use_editorial
+                assign slot_pos = global_index | modulo: slot_count
+                assign cycle = global_index | divided_by: slot_count
+                assign slot_type = slot_types[slot_pos]
+                assign block_index = slot_blocks[slot_pos] | plus: 0
+                assign block_settings = section.blocks[block_index].settings
+              endif
+            -%}
+
+            {%- if use_editorial and show_editorials -%}
+              {%- for entry in editorials -%}
+                {%- liquid
+                  assign entry_parts = entry | split: ':'
+                  assign entry_pos = entry_parts[0] | plus: 0
+                  assign entry_block_index = entry_parts[1] | plus: 0
+                  assign show_entry = false
+                  if entry_pos == slot_pos
+                    if cycle == 0 or section.settings.repeat_banners
+                      assign show_entry = true
+                    endif
+                  elsif entry_pos == slot_count and slot_pos == 0 and cycle > 0
+                    if cycle == 1 or section.settings.repeat_banners
+                      assign show_entry = true
+                    endif
+                  endif
+                -%}
+                {%- if show_entry -%}
+                  {% render 'editorial-banner', block: section.blocks[entry_block_index], index: global_index %}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+
+            {%- liquid
+              assign lazy = true
+              if global_index < 4
+                assign lazy = false
+              endif
+              assign sizes = '(min-width: 990px) 25vw, 50vw'
+              assign primary_index = 0
+              if slot_type == 'f'
+                assign sizes = '(min-width: 990px) 50vw, 100vw'
+                if block_settings.use_second_image
+                  assign primary_index = 1
+                endif
+              endif
+            -%}
+            <div class="ed-grid__item ed-grid__item--{% if slot_type == 'f' %}featured{% if block_settings.desktop_position == 'right' %} ed-grid__item--right{% endif %}{% else %}small{% endif %}" data-grid-item>
+              {% render 'product-card', product: product, lazy: lazy, sizes: sizes, primary_index: primary_index %}
+            </div>
+
+          {%- endfor -%}
+
+          {%- if use_editorial and show_editorials and paginate.next == nil -%}
+            {%- liquid
+              assign rendered_total = offset | plus: collection.products.size
+              assign end_pos = rendered_total | modulo: slot_count
+              assign end_cycle = rendered_total | divided_by: slot_count
+              if end_pos == 0
+                assign end_pos = slot_count
+                assign end_cycle = end_cycle | minus: 1
+              endif
+            -%}
+            {%- if end_cycle == 0 or section.settings.repeat_banners -%}
+              {%- for entry in editorials -%}
+                {%- assign entry_parts = entry | split: ':' -%}
+                {%- assign entry_pos = entry_parts[0] | plus: 0 -%}
+                {%- if entry_pos == end_pos -%}
+                  {%- assign entry_block_index = entry_parts[1] | plus: 0 -%}
+                  {% render 'editorial-banner', block: section.blocks[entry_block_index], index: rendered_total %}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          {%- if section.settings.pagination_mode == 'pages' -%}
+            {% render 'pagination', paginate: paginate %}
+          {%- else -%}
+            <div class="load-more" data-load-more-wrapper>
+              {%- assign shown_count = offset | plus: collection.products.size -%}
+              <p class="load-more__count" data-load-more-count>
+                {{ 'collections.general.showing' | t: shown: shown_count, total: collection.products_count }}
+              </p>
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="button button--outline" data-load-more>{{ 'collections.general.load_more' | t }}</a>
+              {%- endif -%}
+              <div class="load-more__sentinel" data-sentinel aria-hidden="true"></div>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      </infinite-grid>
+    {%- else -%}
+      <div class="page-width">
+        <p class="empty-state">{{ 'collections.general.no_matches' | t }}</p>
+      </div>
+    {%- endif -%}
+  </section>
+
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Coleção",
+  "class": "section-main-collection",
+  "settings": [
+    { "type": "paragraph", "content": "A grade segue a ordem dos blocos (ex.: dois produtos, destaque, 2 × 2, banner editorial) e repete a sequência até o fim da coleção. Os produtos vêm do catálogo na ordem da coleção." },
+    { "type": "range", "id": "products_per_page", "label": "Produtos por carregamento", "min": 12, "max": 48, "step": 1, "default": 26 },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Colunas no desktop",
+      "options": [
+        { "value": "4", "label": "4" },
+        { "value": "6", "label": "6" }
+      ],
+      "default": "4",
+      "info": "Os destaques ocupam 2 × 2 colunas; os banners, a largura inteira ou metade"
+    },
+    { "type": "checkbox", "id": "repeat_banners", "label": "Repetir banners editoriais a cada ciclo da sequência", "default": false },
+    {
+      "type": "select",
+      "id": "filtered_layout",
+      "label": "Quando a cliente filtrar ou reordenar",
+      "options": [
+        { "value": "simple", "label": "Grade simples, sem banners" },
+        { "value": "no_banners", "label": "Manter escala, esconder banners" },
+        { "value": "keep", "label": "Manter composição completa" }
+      ],
+      "default": "no_banners"
+    },
+    {
+      "type": "select",
+      "id": "pagination_mode",
+      "label": "Carregamento de produtos",
+      "options": [
+        { "value": "button", "label": "Botão \"carregar mais\"" },
+        { "value": "infinite", "label": "Automático ao rolar" },
+        { "value": "pages", "label": "Páginas numeradas" }
+      ],
+      "default": "button"
+    },
+    { "type": "checkbox", "id": "show_description", "label": "Mostrar descrição da coleção", "default": false },
+    { "type": "header", "content": "Abas de categorias" },
+    { "type": "text", "id": "category_parent", "label": "Item do menu principal", "info": "Os subitens deste item viram abas acima da grade", "default": "Categorias" },
+    { "type": "link_list", "id": "category_menu", "label": "Ou use um menu próprio" },
+    { "type": "header", "content": "Filtros" },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Habilitar filtros", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Habilitar ordenação", "default": true }
+  ],
+  "blocks": [
+    { "type": "pair", "name": "Dois produtos lado a lado" },
+    {
+      "type": "featured",
+      "name": "Produto em destaque",
+      "settings": [
+        { "type": "paragraph", "content": "Ocupa a largura inteira no celular e 2 × 2 colunas no desktop." },
+        { "type": "checkbox", "id": "use_second_image", "label": "Usar a segunda foto do produto", "info": "Útil quando a segunda foto é a imagem de campanha", "default": false },
+        {
+          "type": "select",
+          "id": "desktop_position",
+          "label": "Posição no desktop",
+          "options": [
+            { "value": "left", "label": "Esquerda" },
+            { "value": "right", "label": "Direita" }
+          ],
+          "default": "right"
+        }
+      ]
+    },
+    { "type": "quad", "name": "Quatro produtos (2 × 2)" },
+    {
+      "type": "row",
+      "name": "Bloco de produtos",
+      "settings": [
+        { "type": "range", "id": "count", "label": "Quantidade de produtos", "min": 2, "max": 12, "step": 2, "default": 4 }
+      ]
+    },
+    {
+      "type": "editorial",
+      "name": "Banner editorial",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Imagem desktop", "info": "Largura inteira: 2880 x 1400px. Metade: 1600 x 2000px" },
+        { "type": "image_picker", "id": "image_mobile", "label": "Imagem celular", "info": "Recomendado 1200 x 1500px" },
+        { "type": "video", "id": "video", "label": "Vídeo (opcional)", "info": "Substitui a imagem" },
+        { "type": "text", "id": "eyebrow", "label": "Texto acima do título" },
+        { "type": "text", "id": "title", "label": "Título" },
+        { "type": "url", "id": "link", "label": "Link da seleção" },
+        { "type": "text", "id": "button_label", "label": "Texto do link", "default": "Ver seleção" },
+        { "type": "color", "id": "text_color", "label": "Cor do texto", "default": "#FFFFFF" },
+        {
+          "type": "select",
+          "id": "desktop_width",
+          "label": "Largura no desktop",
+          "options": [
+            { "value": "full", "label": "Inteira" },
+            { "value": "half", "label": "Metade (2 × 2)" }
+          ],
+          "default": "full"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

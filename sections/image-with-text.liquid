@@ -1,0 +1,57 @@
+<section class="image-with-text section-spacing" style="--section-bg: {{ section.settings.background }}; --section-text: {{ section.settings.text_color }};">
+  <div class="page-width">
+    <div class="image-with-text__grid{% if section.settings.layout == 'image_right' %} image-with-text__grid--reverse{% endif %}">
+      <div class="image-with-text__media">
+        {%- if section.settings.button_link != blank -%}<a href="{{ section.settings.button_link }}" tabindex="-1" aria-hidden="true">{%- endif -%}
+        {%- if section.settings.image -%}
+          {{ section.settings.image | image_url: width: 1800 | image_tag: loading: 'lazy', widths: '500, 800, 1100, 1400, 1800', sizes: '(min-width: 990px) 50vw, 100vw' }}
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'placeholder' }}
+        {%- endif -%}
+        {%- if section.settings.button_link != blank -%}</a>{%- endif -%}
+      </div>
+      <div class="image-with-text__content">
+        {%- if section.settings.subheading != blank -%}
+          <p class="eyebrow">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="image-with-text__heading">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+        {%- if section.settings.button_label != blank -%}
+          <a href="{{ section.settings.button_link | default: '#' }}" class="button">{{ section.settings.button_label }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Imagem com texto",
+  "class": "section-image-with-text",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Imagem" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "image_left", "label": "Imagem à esquerda" },
+        { "value": "image_right", "label": "Imagem à direita" }
+      ],
+      "default": "image_left"
+    },
+    { "type": "text", "id": "subheading", "label": "Sobretítulo" },
+    { "type": "text", "id": "heading", "label": "Título", "default": "Programa de cuidado das peças" },
+    { "type": "richtext", "id": "text", "label": "Texto", "default": "<p>Conserte, ajuste e use de novo. Nossas peças são feitas para durar.</p>" },
+    { "type": "text", "id": "button_label", "label": "Texto do botão", "default": "Saiba mais" },
+    { "type": "url", "id": "button_link", "label": "Link do botão" },
+    { "type": "color", "id": "background", "label": "Fundo", "default": "#F6F6F6" },
+    { "type": "color", "id": "text_color", "label": "Texto", "default": "#000000" }
+  ],
+  "presets": [{ "name": "Imagem com texto" }]
+}
+{% endschema %}

@@ -1,0 +1,39 @@
+{% doc %}
+  Renders one complementary product, as a product card or as a compact cart row with quick add by size.
+
+  @param {product} product - The product to render
+  @param {string} layout - "card" or "compact"
+
+  @example
+  {% render 'cross-sell-item', product: product, layout: 'compact' %}
+{% enddoc %}
+{%- if layout == 'compact' -%}
+  <li class="cart-recs__item">
+    <a href="{{ product.url }}" class="cart-recs__media">
+      {%- if product.featured_image -%}
+        {{ product.featured_image | image_url: width: 300 | image_tag: loading: 'lazy', widths: '150, 300', sizes: '90px', alt: product.featured_image.alt }}
+      {%- endif -%}
+    </a>
+    <div class="cart-recs__details">
+      <a href="{{ product.url }}" class="cart-recs__name">{{ product.title }}</a>
+      {% render 'price', product: product %}
+      {%- form 'product', product, class: 'cart-recs__form', data-product-form: '' -%}
+        {%- if product.has_only_default_variant -%}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <button type="submit" class="cart-recs__add" data-add-to-cart>{{ 'sections.cart.quick_add' | t }}</button>
+        {%- else -%}
+          <div class="cart-recs__variants" role="group" aria-label="{{ 'sections.cart.quick_add' | t }}">
+            {%- for variant in product.variants limit: 8 -%}
+              <button type="submit" name="id" value="{{ variant.id }}" class="cart-recs__variant"{% unless variant.available %} disabled{% endunless %}>
+                {{- variant.title -}}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+        <p class="form-message form-message--error" data-form-error hidden></p>
+      {%- endform -%}
+    </div>
+  </li>
+{%- else -%}
+  {% render 'product-card', product: product %}
+{%- endif -%}

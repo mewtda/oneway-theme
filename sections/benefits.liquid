@@ -1,0 +1,111 @@
+{%- capture whatsapp_url -%}{% render 'whatsapp-url' %}{%- endcapture -%}
+{%- capture benefit_items -%}
+  {%- for block in section.blocks -%}
+    {%- liquid
+      assign benefit_url = block.settings.link
+      if benefit_url == blank and block.settings.icon == 'whatsapp'
+        assign benefit_url = whatsapp_url
+      endif
+    -%}
+    <li class="benefits__item" {{ block.shopify_attributes }}>
+      {%- if benefit_url != blank -%}
+        <a href="{{ benefit_url }}" class="benefits__link"{% if benefit_url contains 'wa.me' %} target="_blank" rel="noopener"{% endif %}>
+      {%- endif -%}
+      <span class="benefits__icon">{% render 'icon', name: block.settings.icon %}</span>
+      {%- if block.settings.title != blank -%}
+        <span class="benefits__title">{{ block.settings.title }}</span>
+      {%- endif -%}
+      {%- if block.settings.text != blank -%}
+        <span class="benefits__text">{{ block.settings.text }}</span>
+      {%- endif -%}
+      {%- if benefit_url != blank -%}
+        </a>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+<section
+  class="benefits benefits--{{ section.settings.style }}"
+  style="--section-bg: {{ section.settings.background }}; --section-text: {{ section.settings.text_color }}; --marquee-duration: {{ section.settings.speed }}s;"
+  aria-label="{{ 'sections.benefits.label' | t }}"
+>
+  {%- if section.settings.style == 'marquee' -%}
+    <div class="benefits__marquee">
+      <ul class="benefits__track">
+        {{ benefit_items }}
+        {{ benefit_items }}
+      </ul>
+      <ul class="benefits__track" aria-hidden="true">
+        {{ benefit_items }}
+        {{ benefit_items }}
+      </ul>
+    </div>
+  {%- else -%}
+    <div class="page-width">
+      <ul class="benefits__list benefits__list--{{ section.blocks.size }}">
+        {{ benefit_items }}
+      </ul>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Vantagens",
+  "class": "section-benefits",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Estilo",
+      "options": [
+        { "value": "marquee", "label": "Faixa rolando" },
+        { "value": "grid", "label": "Colunas" }
+      ],
+      "default": "marquee"
+    },
+    { "type": "range", "id": "speed", "label": "Duração de uma volta", "min": 15, "max": 90, "step": 5, "unit": "s", "default": 40 },
+    { "type": "color", "id": "background", "label": "Fundo", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Texto", "default": "#FFFFFF" }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Vantagem",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Ícone",
+          "options": [
+            { "value": "truck", "label": "Caminhão" },
+            { "value": "tag", "label": "Etiqueta" },
+            { "value": "whatsapp", "label": "WhatsApp" },
+            { "value": "percent", "label": "Porcentagem" },
+            { "value": "card", "label": "Cartão" },
+            { "value": "exchange", "label": "Troca" },
+            { "value": "store", "label": "Loja" }
+          ],
+          "default": "truck"
+        },
+        { "type": "text", "id": "title", "label": "Título", "default": "Frete grátis" },
+        { "type": "text", "id": "text", "label": "Texto" },
+        { "type": "url", "id": "link", "label": "Link", "info": "No ícone WhatsApp, vazio = abre o WhatsApp da loja" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vantagens",
+      "blocks": [
+        { "type": "benefit", "settings": { "icon": "truck", "title": "Frete para todo o Brasil", "text": "" } },
+        { "type": "benefit", "settings": { "icon": "percent", "title": "Primeira troca grátis", "text": "" } },
+        { "type": "benefit", "settings": { "icon": "tag", "title": "Parcelamento até 12x", "text": "Até 3x sem juros" } },
+        { "type": "benefit", "settings": { "icon": "whatsapp", "title": "Fale conosco", "text": "Atendimento via WhatsApp e e-mail" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

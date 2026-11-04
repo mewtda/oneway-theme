@@ -1,0 +1,19 @@
+{% doc %}
+  Renders the floating WhatsApp button in the bottom-right corner.
+
+  @example
+  {% render 'whatsapp-float' %}
+{% enddoc %}
+{%- capture whatsapp_url -%}{% render 'whatsapp-url' %}{%- endcapture -%}
+{%- if settings.whatsapp_floating and whatsapp_url != blank -%}
+  <a
+    href="{{ whatsapp_url }}"
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener"
+    aria-label="{{ 'sections.header.support' | t }} WhatsApp"
+    style="--whatsapp-bg: {{ settings.whatsapp_floating_color }};"
+  >
+    {%- render 'icon', name: 'whatsapp' -%}
+  </a>
+{%- endif -%}

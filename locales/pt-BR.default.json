@@ -1,0 +1,264 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "accessibility": {
+    "skip_to_content": "Pular para o conteúdo"
+  },
+  "general": {
+    "close": "Fechar",
+    "error": "Algo deu errado. Tente novamente.",
+    "pagination": {
+      "label": "Paginação",
+      "next": "Próxima página",
+      "previous": "Página anterior",
+      "page": "Página {{ page }}"
+    },
+    "search": {
+      "title": "Buscar",
+      "placeholder": "O que você procura?",
+      "submit": "Buscar",
+      "results_count": {
+        "one": "{{ count }} resultado para \"{{ terms }}\"",
+        "other": "{{ count }} resultados para \"{{ terms }}\""
+      }
+    }
+  },
+  "sections": {
+    "announcement": {
+      "label": "Anúncios"
+    },
+    "header": {
+      "menu": "Menu",
+      "country": "País/região",
+      "view_all": "Ver tudo",
+      "support": "Atendimento"
+    },
+    "slideshow": {
+      "label": "Slideshow",
+      "next": "Próximo slide",
+      "previous": "Slide anterior"
+    },
+    "featured_collection": {
+      "view_all": "Ver tudo",
+      "placeholder_title": "Nome do produto"
+    },
+    "blog_posts": {
+      "view_all": "Ver todos",
+      "placeholder_title": "Título do post"
+    },
+    "benefits": {
+      "label": "Vantagens"
+    },
+    "store_location": {
+      "directions": "Como chegar",
+      "open_map": "Abrir no Google Maps"
+    },
+    "newsletter": {
+      "email": "Seu e-mail",
+      "subscribe": "Assinar",
+      "success": "Obrigado por se inscrever!"
+    },
+    "footer": {
+      "rights": "Todos os direitos reservados.",
+      "payment_methods": "Formas de pagamento",
+      "security": "Compra segura",
+      "ssl_label": "Security by",
+      "ssl_title": "SSL 256 bits",
+      "shopify_label": "Loja protegida por",
+      "shopify_title": "Shopify",
+      "developed_by": "Desenvolvido por:"
+    },
+    "cart": {
+      "title": "Carrinho",
+      "empty": "Seu carrinho está vazio.",
+      "continue_shopping": "Continuar comprando",
+      "remove": "Remover",
+      "subtotal": "Subtotal",
+      "taxes_and_shipping": "Frete e descontos calculados no checkout.",
+      "note": "Observações do pedido",
+      "checkout": "Finalizar compra",
+      "recommendations": "Você também vai curtir",
+      "quick_add": "Adicionar",
+      "free_shipping_label": "Progresso para frete grátis",
+      "free_shipping_remaining_html": "Faltam <strong>{{ amount }}</strong> para você ganhar <strong>frete grátis</strong>",
+      "free_shipping_reached_html": "Parabéns! Você ganhou <strong>frete grátis</strong>"
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Adicionar ao carrinho",
+      "sold_out": "Esgotado",
+      "unavailable": "Indisponível",
+      "on_sale": "Promoção",
+      "price_from": "A partir de {{ price }}",
+      "regular_price": "Preço normal",
+      "sale_price": "Preço promocional",
+      "quantity": "Quantidade",
+      "quantity_decrease": "Diminuir quantidade",
+      "quantity_increase": "Aumentar quantidade",
+      "taxes_included": "Impostos inclusos.",
+      "share": "Compartilhar",
+      "previous_image": "Foto anterior",
+      "next_image": "Próxima foto",
+      "add_short": "Adicionar",
+      "size_guide": "Guia de tamanhos",
+      "model_wears": "A modelo veste {{ size }}",
+      "description": "Descrição",
+      "installments": "ou {{ count }}x de {{ value }} sem juros"
+    },
+    "feed": {
+      "load_more": "Carregar mais"
+    }
+  },
+  "collections": {
+    "general": {
+      "all_collections": "Coleções",
+      "no_matches": "Nenhum produto encontrado.",
+      "products_count": {
+        "one": "{{ count }} produto",
+        "other": "{{ count }} produtos"
+      },
+      "load_more": "Carregar mais",
+      "showing": "Mostrando {{ shown }} de {{ total }}"
+    },
+    "filters": {
+      "from": "De",
+      "to": "Até",
+      "clear": "Limpar filtros",
+      "title_and_sort": "Filtrar e ordenar",
+      "active": "Filtros ativos",
+      "remove": "Remover filtro",
+      "see_results": {
+        "one": "Ver {{ count }} produto",
+        "other": "Ver {{ count }} produtos"
+      }
+    },
+    "sorting": {
+      "title": "Ordenar por"
+    }
+  },
+  "blogs": {
+    "article": {
+      "all": "Todos",
+      "read_more": "Ler mais",
+      "back": "Voltar para {{ title }}"
+    }
+  },
+  "customer": {
+    "login": {
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Senha",
+      "forgot_password": "Esqueceu sua senha?",
+      "sign_in": "Entrar",
+      "create_account": "Criar conta",
+      "guest_title": "Continuar como visitante",
+      "guest_continue": "Continuar"
+    },
+    "recover_password": {
+      "title": "Redefinir senha",
+      "subtext": "Enviaremos um e-mail para você redefinir sua senha.",
+      "submit": "Enviar",
+      "cancel": "Cancelar",
+      "success": "Enviamos um e-mail com um link para redefinir sua senha."
+    },
+    "register": {
+      "title": "Criar conta",
+      "first_name": "Nome",
+      "last_name": "Sobrenome",
+      "accepts_marketing": "Quero receber novidades por e-mail",
+      "submit": "Criar conta"
+    },
+    "account": {
+      "title": "Minha conta",
+      "log_out": "Sair",
+      "my_account": "Minha conta",
+      "my_orders": "Meus pedidos",
+      "my_addresses": "Meus endereços",
+      "my_cart": "Meu carrinho",
+      "order_history": "Histórico de pedidos",
+      "no_orders": "Você ainda não fez nenhum pedido.",
+      "details": "Dados da conta",
+      "view_addresses": {
+        "one": "Ver endereço ({{ count }})",
+        "other": "Ver endereços ({{ count }})"
+      },
+      "return": "Voltar para a conta"
+    },
+    "order": {
+      "title": "Pedido {{ name }}",
+      "order": "Pedido",
+      "date": "Data",
+      "payment_status": "Pagamento",
+      "fulfillment_status": "Envio",
+      "total": "Total",
+      "product": "Produto",
+      "quantity": "Quantidade",
+      "billing_address": "Endereço de cobrança",
+      "shipping_address": "Endereço de entrega",
+      "cancelled": "Pedido cancelado em {{ date }}",
+      "track": "Rastrear"
+    },
+    "addresses": {
+      "title": "Endereços",
+      "default": "Padrão",
+      "add": "Adicionar endereço",
+      "edit": "Editar",
+      "update": "Salvar endereço",
+      "delete": "Excluir",
+      "delete_confirm": "Tem certeza que deseja excluir este endereço?",
+      "company": "Empresa",
+      "address1": "Endereço",
+      "address2": "Complemento",
+      "city": "Cidade",
+      "zip": "CEP",
+      "country": "País",
+      "province": "Estado",
+      "set_default": "Definir como endereço padrão"
+    },
+    "reset_password": {
+      "title": "Redefinir senha",
+      "confirm": "Confirmar senha",
+      "submit": "Redefinir senha"
+    },
+    "activate_account": {
+      "title": "Ativar conta",
+      "submit": "Ativar conta",
+      "decline": "Recusar convite"
+    }
+  },
+  "templates": {
+    "404": {
+      "title": "Página não encontrada",
+      "subtext": "A página que você procura não existe ou foi removida."
+    },
+    "contact": {
+      "name": "Nome",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "message": "Mensagem",
+      "send": "Enviar",
+      "success": "Obrigado pelo contato! Responderemos o mais breve possível."
+    },
+    "password": {
+      "enter_with_password": "Entrar com senha",
+      "password": "Senha",
+      "enter": "Entrar"
+    }
+  },
+  "gift_cards": {
+    "issued": {
+      "title": "Seu vale-presente de {{ value }}",
+      "expired": "Este vale-presente expirou ou está desativado.",
+      "shop_link": "Ir para a loja",
+      "add_to_apple_wallet": "Adicionar à Apple Wallet"
+    }
+  }
+}

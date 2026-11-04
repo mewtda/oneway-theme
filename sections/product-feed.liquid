@@ -1,0 +1,132 @@
+{%- comment -%}
+  Vitrine contínua de recomendações.
+  - Na página de produto: renderiza o "casco" e o JS busca as fontes em ordem
+    (complementares → relacionados → coleções do produto → coleção reserva → todos).
+  - Quando chamada pela rota de recomendações ou por uma coleção (Section Rendering API),
+    devolve apenas os cards.
+{%- endcomment -%}
+{%- liquid
+  assign per_load = section.settings.products_per_load
+-%}
+
+{%- if recommendations.performed? -%}
+  <div data-feed-items>
+    {%- for item in recommendations.products -%}
+      {%- if item.available or section.settings.show_sold_out -%}
+        <div class="feed__item" data-feed-item data-product-id="{{ item.id }}">
+          {% render 'product-card', product: item %}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+{%- elsif product == blank and collection -%}
+  {%- paginate collection.products by per_load -%}
+    <div data-feed-items data-next-page="{% if paginate.next %}{{ paginate.current_page | plus: 1 }}{% endif %}">
+      {%- for item in collection.products -%}
+        {%- if item.available or section.settings.show_sold_out -%}
+          <div class="feed__item" data-feed-item data-product-id="{{ item.id }}">
+            {% render 'product-card', product: item %}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- endpaginate -%}
+
+{%- elsif product -%}
+  {%- liquid
+    assign exclude_ids = product.id | append: ''
+    assign look_key = section.settings.look_metafield | default: 'custom.compre_o_look' | split: '.'
+    assign look_products = product.metafields[look_key[0]][look_key[1]].value
+    for look_product in look_products
+      assign exclude_ids = exclude_ids | append: ',' | append: look_product.id
+    endfor
+
+    assign sources = ''
+    assign rec_base = routes.product_recommendations_url | append: '?product_id=' | append: product.id | append: '&limit=10&section_id=' | append: section.id
+    if section.settings.use_complementary
+      assign sources = sources | append: rec_base | append: '&intent=complementary' | append: '|'
+    endif
+    assign sources = sources | append: rec_base | append: '&intent=related' | append: '|'
+
+    assign skip_handles = section.settings.skip_collections | downcase | split: ','
+    assign used_collections = 0
+    for product_collection in product.collections
+      if used_collections >= 2
+        break
+      endif
+      assign handle_key = product_collection.handle | downcase
+      assign skip = false
+      for skip_handle in skip_handles
+        assign clean_handle = skip_handle | strip
+        if clean_handle == handle_key
+          assign skip = true
+        endif
+      endfor
+      if skip or product_collection.products_count < 2
+        continue
+      endif
+      assign sources = sources | append: 'collection:' | append: product_collection.url | append: '|'
+      assign used_collections = used_collections | plus: 1
+    endfor
+    if section.settings.fallback_collection
+      assign sources = sources | append: 'collection:' | append: section.settings.fallback_collection.url | append: '|'
+    endif
+    assign sources = sources | append: 'collection:' | append: routes.all_products_collection_url
+  -%}
+  <section class="feed section-spacing" aria-labelledby="Feed-{{ section.id }}">
+    <div class="feed__header page-width">
+      <h2 class="feed__title" id="Feed-{{ section.id }}">{{ section.settings.heading }}</h2>
+    </div>
+
+    <product-feed
+      class="feed__body"
+      data-section-id="{{ section.id }}"
+      data-sources="{{ sources | escape }}"
+      data-exclude="{{ exclude_ids }}"
+      data-max-items="{{ section.settings.max_products }}"
+      data-auto-loads="{{ section.settings.auto_loads }}"
+      data-memory-key="feed:{{ product.handle }}"
+      data-collection-section="product-feed"
+    >
+      <div class="feed__grid feed__grid--desktop-{{ section.settings.columns_desktop }}" data-feed-grid aria-live="polite"></div>
+      <div class="feed__skeleton feed__grid feed__grid--desktop-{{ section.settings.columns_desktop }}" data-feed-skeleton aria-hidden="true">
+        {%- for i in (1..4) -%}<div class="feed__ghost"></div>{%- endfor -%}
+      </div>
+      <div class="load-more">
+        <button type="button" class="button button--outline" data-feed-more hidden>{{ 'products.feed.load_more' | t }}</button>
+        <div class="load-more__sentinel" data-sentinel aria-hidden="true"></div>
+      </div>
+    </product-feed>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Vitrine de recomendações",
+  "class": "section-product-feed",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Você também pode gostar" },
+    { "type": "paragraph", "content": "Ordem das sugestões: complementos do look (Search & Discovery) → produtos relacionados → coleções do produto → coleção reserva → todos os produtos. Itens repetidos e os já exibidos em \"Compre o look\" são ignorados." },
+    { "type": "checkbox", "id": "use_complementary", "label": "Começar pelos produtos complementares", "info": "Configure em Search & Discovery → Recomendações de produtos", "default": true },
+    { "type": "text", "id": "skip_collections", "label": "Coleções a ignorar", "info": "Handles separados por vírgula", "default": "all,todos-os-produtos,frontpage,sale,best-sellers,novidades" },
+    { "type": "collection", "id": "fallback_collection", "label": "Coleção reserva" },
+    { "type": "range", "id": "products_per_load", "label": "Produtos por carregamento", "min": 8, "max": 24, "step": 4, "default": 12 },
+    { "type": "range", "id": "max_products", "label": "Máximo de produtos", "min": 12, "max": 120, "step": 4, "default": 60 },
+    { "type": "range", "id": "auto_loads", "label": "Carregamentos automáticos", "info": "Depois disso aparece o botão \"carregar mais\", liberando o acesso ao rodapé", "min": 0, "max": 10, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Colunas no desktop",
+      "options": [
+        { "value": "4", "label": "4" },
+        { "value": "5", "label": "5" }
+      ],
+      "default": "5"
+    },
+    { "type": "checkbox", "id": "show_sold_out", "label": "Incluir produtos esgotados", "default": false },
+    { "type": "text", "id": "look_metafield", "label": "Metafield \"Compre o look\"", "info": "Lista de produtos, formato namespace.chave", "default": "custom.compre_o_look" }
+  ],
+  "presets": [{ "name": "Vitrine de recomendações" }]
+}
+{% endschema %}

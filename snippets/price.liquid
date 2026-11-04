@@ -1,0 +1,34 @@
+{% doc %}
+  Renders a product or variant price, with compare-at price when on sale.
+
+  @param {product} product - The product
+  @param {variant} [variant] - Optional variant, defaults to the selected or first available variant
+  @param {boolean} [show_from] - Show "a partir de" when variant prices differ
+
+  @example
+  {% render 'price', product: product, show_from: true %}
+{% enddoc %}
+{%- liquid
+  assign target = variant | default: product.selected_or_first_available_variant
+  assign price = target.price
+  assign compare_at = target.compare_at_price
+  assign on_sale = false
+  if compare_at > price
+    assign on_sale = true
+  endif
+-%}
+<div class="price{% if on_sale %} price--on-sale{% endif %}{% if product.available == false %} price--sold-out{% endif %}" data-price>
+  {%- if show_from and product.price_varies -%}
+    {%- assign price_min = product.price_min | money -%}
+    <span class="price__regular">{{ 'products.product.price_from' | t: price: price_min }}</span>
+  {%- else -%}
+    {%- if on_sale -%}
+      <span class="visually-hidden">{{ 'products.product.sale_price' | t }}</span>
+      <span class="price__sale">{{ price | money }}</span>
+      <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+      <s class="price__compare">{{ compare_at | money }}</s>
+    {%- else -%}
+      <span class="price__regular">{{ price | money }}</span>
+    {%- endif -%}
+  {%- endif -%}
+</div>

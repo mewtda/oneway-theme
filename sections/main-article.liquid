@@ -1,0 +1,26 @@
+<article class="main-article section-spacing">
+  {%- if article.image -%}
+    <div class="main-article__hero">
+      {{ article.image | image_url: width: 2400 | image_tag: widths: '800, 1200, 1600, 2000, 2400', sizes: '100vw', alt: article.image.alt, fetchpriority: 'high' }}
+    </div>
+  {%- endif -%}
+  <div class="main-article__inner">
+    <header class="main-article__header">
+      <p class="article-card__date">{{ article.published_at | time_tag: format: 'date' }}</p>
+      <h1 class="page-title">{{ article.title }}</h1>
+    </header>
+    <div class="rte">{{ article.content }}</div>
+    <a href="{{ blog.url }}" class="link-underline main-article__back">{{ 'blogs.article.back' | t: title: blog.title }}</a>
+  </div>
+</article>
+
+<script type="application/ld+json">
+  {{ article | structured_data }}
+</script>
+
+{% schema %}
+{
+  "name": "Artigo",
+  "class": "section-main-article"
+}
+{% endschema %}

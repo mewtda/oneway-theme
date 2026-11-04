@@ -1,0 +1,66 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Rodapé",
+  "sections": {
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Newsletter",
+        "text": "<p>Cadastre-se para receber novidades, ofertas e lançamentos.</p>",
+        "background": "#FFFFFF",
+        "text_color": "#000000"
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "contact": {
+          "type": "contact",
+          "settings": {
+            "heading": "Atendimento",
+            "address": "",
+            "show_email": true,
+            "hours": ""
+          }
+        },
+        "legal": {
+          "type": "menu",
+          "settings": {
+            "heading": "Legal",
+            "menu": "footer"
+          }
+        },
+        "account": {
+          "type": "account",
+          "settings": {
+            "heading": "Sobre",
+            "menu": ""
+          }
+        }
+      },
+      "block_order": [
+        "contact",
+        "legal",
+        "account"
+      ],
+      "settings": {
+        "text": "",
+        "use_inverse_logo": false,
+        "show_payment_icons": true
+      }
+    }
+  },
+  "order": [
+    "newsletter",
+    "footer"
+  ]
+}

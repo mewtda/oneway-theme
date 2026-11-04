@@ -1,0 +1,26 @@
+{%- paginate blog.articles by 9 -%}
+  <section class="main-blog page-width section-spacing">
+    <h1 class="page-title">{{ blog.title }}</h1>
+    {%- if blog.all_tags.size > 0 -%}
+      <ul class="tag-list">
+        <li><a href="{{ blog.url }}"{% unless current_tags %} aria-current="page"{% endunless %}>{{ 'blogs.article.all' | t }}</a></li>
+        {%- for tag in blog.all_tags -%}
+          <li>{{ tag | link_to_tag: tag }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    <div class="article-grid">
+      {%- for article in blog.articles -%}
+        {% render 'article-card', article: article %}
+      {%- endfor -%}
+    </div>
+    {% render 'pagination', paginate: paginate %}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Blog",
+  "class": "section-main-blog"
+}
+{% endschema %}

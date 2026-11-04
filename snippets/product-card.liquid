@@ -1,0 +1,167 @@
+{% doc %}
+  Renders a product card with a swipeable gallery of all product images, with videos first when the "mostrar_video" metafield is on, title, price and available sizes.
+
+  @param {product} product - The product to render
+  @param {string} [sizes] - Value for the image sizes attribute
+  @param {boolean} [lazy] - Lazy-load the first image, defaults to true
+  @param {number} [primary_index] - Index of the image shown first (1 = second photo, often the editorial shot)
+
+  @example
+  {% render 'product-card', product: product %}
+{% enddoc %}
+{%- liquid
+  assign sizes_attr = sizes | default: '(min-width: 990px) 25vw, 50vw'
+  assign loading = 'lazy'
+  if lazy == false
+    assign loading = 'eager'
+  endif
+
+  assign images = product.media | where: 'media_type', 'image'
+  assign primary_media = product.featured_media
+  assign secondary_media = product.media[1]
+  if primary_index == 1 and images.size > 1
+    assign primary_media = images[1]
+    assign secondary_media = images[0]
+  endif
+  assign card_media = images
+
+  assign video_metafield = settings.card_video_metafield | default: 'custom.mostrar_video' | split: '.'
+  assign video_namespace = video_metafield | first | strip
+  assign video_key = video_metafield | last | strip
+  assign show_video = product.metafields[video_namespace][video_key].value | append: '' | downcase | strip
+  assign videos = product.media | where: 'media_type', 'video'
+  if show_video == 'true' or show_video == 'sim'
+    assign card_media = videos | concat: images
+  else
+    assign videos = images | where: 'media_type', 'video'
+  endif
+  assign media_limit = 1
+  assign use_gallery = false
+  if settings.card_show_gallery and card_media.size > 1
+    assign use_gallery = true
+    assign media_limit = 12
+  endif
+
+  assign size_names = settings.card_size_option_names | downcase | split: ','
+  assign size_option = null
+  for option in product.options_with_values
+    assign option_name = option.name | downcase | strip
+    for size_name in size_names
+      assign size_name_clean = size_name | strip
+      if option_name == size_name_clean
+        assign size_option = option
+      endif
+    endfor
+  endfor
+
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+-%}
+<article class="product-card" data-product-id="{{ product.id }}">
+  <card-gallery class="product-card__media{% if use_gallery %} product-card__media--gallery{% endif %}">
+    <a href="{{ product.url }}" class="product-card__track" aria-label="{{ product.title | escape }}" data-track>
+      {%- if use_gallery or videos.size > 0 -%}
+        {%- for media in card_media limit: media_limit -%}
+          <div class="product-card__slide">
+            {%- if media.media_type == 'video' -%}
+              {{
+                media
+                | video_tag:
+                  class: 'product-card__image',
+                  autoplay: true,
+                  loop: true,
+                  muted: true,
+                  playsinline: true,
+                  controls: false,
+                  preload: 'metadata',
+                  image_size: '1000x'
+              }}
+            {%- else -%}
+              {%- assign image_loading = 'lazy' -%}
+              {%- if forloop.first -%}{%- assign image_loading = loading -%}{%- endif -%}
+              {{
+                media
+                | image_url: width: 1600
+                | image_tag:
+                  class: 'product-card__image',
+                  widths: '300, 450, 600, 800, 1000, 1300, 1600',
+                  sizes: sizes_attr,
+                  loading: image_loading,
+                  alt: media.alt
+              }}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      {%- elsif primary_media -%}
+        <div class="product-card__slide">
+          {{
+            primary_media
+            | image_url: width: 1600
+            | image_tag:
+              class: 'product-card__image product-card__image--primary',
+              widths: '300, 450, 600, 800, 1000, 1300, 1600',
+              sizes: sizes_attr,
+              loading: loading,
+              alt: primary_media.alt | default: product.title
+          }}
+          {%- if settings.card_show_second_image and secondary_media -%}
+            {{
+              secondary_media
+              | image_url: width: 1600
+              | image_tag:
+                class: 'product-card__image product-card__image--secondary',
+                widths: '300, 450, 600, 800, 1000, 1300, 1600',
+                sizes: sizes_attr,
+                loading: 'lazy',
+                alt: secondary_media.alt | default: product.title
+            }}
+          {%- endif -%}
+        </div>
+      {%- else -%}
+        <div class="product-card__slide">
+          {{ 'product-apparel-1' | placeholder_svg_tag: 'product-card__image placeholder' }}
+        </div>
+      {%- endif -%}
+    </a>
+
+    {%- if use_gallery -%}
+      <button type="button" class="product-card__arrow product-card__arrow--prev" data-gallery-prev aria-label="{{ 'products.product.previous_image' | t }}" disabled>
+        {%- render 'icon', name: 'arrow-left' -%}
+      </button>
+      <button type="button" class="product-card__arrow product-card__arrow--next" data-gallery-next aria-label="{{ 'products.product.next_image' | t }}">
+        {%- render 'icon', name: 'arrow-right' -%}
+      </button>
+      <div class="product-card__dots" aria-hidden="true">
+        {%- for media in card_media limit: media_limit -%}
+          <span class="product-card__dot{% if forloop.first %} is-active{% endif %}"></span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if product.available == false -%}
+      <span class="badge">{{ 'products.product.sold_out' | t }}</span>
+    {%- elsif on_sale -%}
+      <span class="badge badge--sale">{{ 'products.product.on_sale' | t }}</span>
+    {%- endif -%}
+  </card-gallery>
+
+  <div class="product-card__info">
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    {% render 'price', product: product, show_from: false %}
+  </div>
+
+  {%- if settings.card_show_sizes and size_option -%}
+    <ul class="product-card__sizes" aria-label="{{ size_option.name | escape }}">
+      {%- for value in size_option.values limit: 4 -%}
+        <li class="{% unless value.available %}is-unavailable{% endunless %}">{{ value }}</li>
+      {%- endfor -%}
+      {%- if size_option.values.size > 4 -%}
+        <li>+{{ size_option.values.size | minus: 4 }}</li>
+      {%- endif -%}
+    </ul>
+  {%- endif -%}
+</article>

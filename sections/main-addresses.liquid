@@ -1,0 +1,49 @@
+{%- paginate customer.addresses by 10 -%}
+  <section class="customer customer--wide page-width section-spacing">
+    <div class="customer__top">
+      <h1 class="page-title">{{ 'customer.addresses.title' | t }}</h1>
+      <a href="{{ routes.account_url }}" class="link-underline">{{ 'customer.account.return' | t }}</a>
+    </div>
+
+    <div class="customer__grid">
+      <ul class="address-list">
+        {%- for address in customer.addresses -%}
+          <li class="address-list__item">
+            {%- if address == customer.default_address -%}
+              <p class="eyebrow">{{ 'customer.addresses.default' | t }}</p>
+            {%- endif -%}
+            {{ address | format_address }}
+            <details>
+              <summary class="link-underline">{{ 'customer.addresses.edit' | t }}</summary>
+              {%- form 'customer_address', address, class: 'form' -%}
+                {% render 'address-fields', form: form, id: address.id %}
+                <button type="submit" class="button">{{ 'customer.addresses.update' | t }}</button>
+              {%- endform -%}
+            </details>
+            <form method="post" action="{{ address.url }}" data-confirm="{{ 'customer.addresses.delete_confirm' | t }}">
+              <input type="hidden" name="_method" value="delete">
+              <button type="submit" class="link-underline">{{ 'customer.addresses.delete' | t }}</button>
+            </form>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <details class="address-new"{% if customer.addresses_count == 0 %} open{% endif %}>
+        <summary class="button">{{ 'customer.addresses.add' | t }}</summary>
+        {%- form 'customer_address', customer.new_address, class: 'form' -%}
+          {% render 'address-fields', form: form, id: 'new' %}
+          <button type="submit" class="button">{{ 'customer.addresses.add' | t }}</button>
+        {%- endform -%}
+      </details>
+    </div>
+
+    {% render 'pagination', paginate: paginate %}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Endereços",
+  "class": "section-main-addresses"
+}
+{% endschema %}

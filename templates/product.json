@@ -1,0 +1,35 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": { "type": "title", "settings": {} },
+        "price": { "type": "price", "settings": { "installments": 1 } },
+        "variant_picker": { "type": "variant_picker", "settings": {} },
+        "size_guide": { "type": "size_guide", "settings": { "metafield": "custom.tabela_de_medidas", "heading": "Guia de tamanhos" } },
+        "model_info": { "type": "model_info", "settings": { "size_metafield": "custom.tamanho_modelo", "measures_metafield": "custom.medidas_modelo" } },
+        "buy_buttons": { "type": "buy_buttons", "settings": { "show_quantity": false, "show_dynamic_checkout": false } },
+        "description": { "type": "description", "settings": { "collapsible": true } },
+        "tab-composition": { "type": "collapsible_tab", "settings": { "heading": "Composição e cuidados", "metafield": "custom.composicao", "content": "" } },
+        "tab-shipping": { "type": "collapsible_tab", "settings": { "heading": "Envio e trocas", "content": "<p>Consulte prazos e condições de troca na nossa política.</p>" } },
+        "shop_the_look": { "type": "shop_the_look", "settings": { "heading": "Compre o look", "metafield": "custom.compre_o_look" } },
+        "share": { "type": "share", "settings": {} }
+      },
+      "block_order": ["title", "price", "variant_picker", "size_guide", "model_info", "buy_buttons", "description", "tab-composition", "tab-shipping", "shop_the_look", "share"],
+      "settings": { "videos_first": false, "sticky_bar": true }
+    },
+    "feed": {
+      "type": "product-feed",
+      "settings": {
+        "heading": "Você também pode gostar",
+        "use_complementary": true,
+        "products_per_load": 12,
+        "max_products": 60,
+        "auto_loads": 3,
+        "columns_desktop": "5",
+        "show_sold_out": false
+      }
+    }
+  },
+  "order": ["main", "feed"]
+}

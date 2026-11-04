@@ -1,0 +1,58 @@
+{
+  "sections": {
+    "hero": {
+      "type": "slideshow",
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading": "New Drop",
+            "subheading": "",
+            "button_label": "Shop now",
+            "link": "shopify://collections/novidades",
+            "button_style": "light",
+            "text_position": "center",
+            "text_color": "#ffffff"
+          }
+        }
+      },
+      "block_order": ["slide-1"],
+      "settings": { "height": "full", "autoplay": true, "speed": 6 }
+    },
+    "selections": {
+      "type": "banner-entries",
+      "blocks": {
+        "party": {
+          "type": "banner",
+          "settings": { "title": "Party Collection", "link": "shopify://collections/party", "button_label": "Ver seleção", "desktop_width": "half", "ratio_desktop": "4 / 5", "ratio_mobile": "4 / 5", "text_position": "bottom-center" }
+        },
+        "beachwear": {
+          "type": "banner",
+          "settings": { "title": "Beachwear", "link": "shopify://collections/beachwear", "button_label": "Ver seleção", "desktop_width": "half", "ratio_desktop": "4 / 5", "ratio_mobile": "4 / 5", "text_position": "bottom-center" }
+        },
+        "conjuntos": {
+          "type": "banner",
+          "settings": { "title": "Conjuntos", "link": "shopify://collections/conjunto", "button_label": "Ver seleção", "desktop_width": "full", "ratio_desktop": "21 / 9", "ratio_mobile": "4 / 5", "text_position": "center" }
+        },
+        "acessorios": {
+          "type": "banner",
+          "settings": { "title": "Acessórios", "link": "shopify://collections/acessorios", "button_label": "Ver seleção", "desktop_width": "half", "ratio_desktop": "4 / 5", "ratio_mobile": "4 / 5", "text_position": "bottom-center" }
+        }
+      },
+      "block_order": ["party", "beachwear", "conjuntos", "acessorios"],
+      "settings": { "heading": "", "full_width": true, "gap": "small", "columns_mobile": "1", "text_color": "#FFFFFF", "overlay": 10 }
+    },
+    "new-in": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "New in",
+        "collection": "novidades",
+        "products_to_show": 8,
+        "columns_desktop": "4",
+        "mobile_scroll": true,
+        "show_view_all": true
+      }
+    }
+  },
+  "order": ["hero", "selections", "new-in"]
+}

@@ -1,0 +1,26 @@
+{% doc %}
+  Renders cart totals, optional note and checkout button.
+
+  @example
+  {% render 'cart-summary' %}
+{% enddoc %}
+<div class="cart-summary">
+  {%- for discount in cart.cart_level_discount_applications -%}
+    <p class="cart-summary__row">
+      <span>{{ discount.title }}</span>
+      <span>-{{ discount.total_allocated_amount | money }}</span>
+    </p>
+  {%- endfor -%}
+  <p class="cart-summary__row cart-summary__total">
+    <span>{{ 'sections.cart.subtotal' | t }}</span>
+    <span>{{ cart.total_price | money }}</span>
+  </p>
+  <p class="cart-summary__note">{{ 'sections.cart.taxes_and_shipping' | t }}</p>
+  <form action="{{ routes.cart_url }}" method="post" class="cart-summary__form">
+    {%- if settings.cart_show_note -%}
+      <label for="CartNote" class="cart-summary__note-label">{{ 'sections.cart.note' | t }}</label>
+      <textarea id="CartNote" name="note" rows="2">{{ cart.note }}</textarea>
+    {%- endif -%}
+    <button type="submit" name="checkout" class="button button--full">{{ 'sections.cart.checkout' | t }}</button>
+  </form>
+</div>

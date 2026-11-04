@@ -1,0 +1,244 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign logo = settings.logo
+  assign logo_height = settings.logo_width
+  if logo
+    assign logo_height = settings.logo_width | divided_by: logo.aspect_ratio | round
+  endif
+
+-%}
+{%- capture whatsapp_url -%}{% render 'whatsapp-url' %}{%- endcapture -%}
+<header class="site-header{% if section.settings.sticky %} site-header--sticky{% endif %}" data-header>
+  <div class="site-header__inner page-width">
+    <div class="site-header__left">
+      <button type="button" class="site-header__icon site-header__menu-toggle" aria-controls="MobileMenu" aria-expanded="false" data-menu-open>
+        {%- render 'icon', name: 'menu' -%}
+        <span class="visually-hidden">{{ 'sections.header.menu' | t }}</span>
+      </button>
+
+      <nav class="site-nav" aria-label="{{ 'sections.header.menu' | t }}">
+        <ul class="site-nav__list">
+          {%- for link in menu.links -%}
+            <li class="site-nav__item{% if link.links.size > 0 %} site-nav__item--has-dropdown{% endif %}">
+              <a href="{{ link.url }}" class="site-nav__link{% if link.active or link.child_active %} is-active{% endif %}"{% if link.links.size > 0 %} aria-haspopup="true"{% endif %}>
+                {{- link.title -}}
+              </a>
+              {%- if link.links.size > 0 -%}
+                {%- liquid
+                  assign flat_count = 0
+                  for child in link.links
+                    if child.links.size == 0
+                      assign flat_count = flat_count | plus: 1
+                    endif
+                  endfor
+                  assign flat_span = flat_count | divided_by: 8.0 | ceil | at_most: 3 | at_least: 1
+                -%}
+                <div class="mega-menu">
+                  <div class="mega-menu__inner page-width">
+                    <div class="mega-menu__links">
+                      {%- if flat_count > 0 -%}
+                        <div class="mega-menu__group mega-menu__group--span-{{ flat_span }}">
+                          <a href="{{ link.url }}" class="mega-menu__heading">{{ link.title }}</a>
+                          <ul class="mega-menu__list">
+                            {%- for child in link.links -%}
+                              {%- if child.links.size == 0 -%}
+                                <li><a href="{{ child.url }}"{% if child.active %} aria-current="page"{% endif %}>{{ child.title }}</a></li>
+                              {%- endif -%}
+                            {%- endfor -%}
+                          </ul>
+                        </div>
+                      {%- endif -%}
+
+                      {%- for child in link.links -%}
+                        {%- if child.links.size > 0 -%}
+                          {%- assign group_span = child.links.size | divided_by: 8.0 | ceil | at_most: 3 | at_least: 1 -%}
+                          <div class="mega-menu__group mega-menu__group--span-{{ group_span }}">
+                            <a href="{{ child.url }}" class="mega-menu__heading">{{ child.title }}</a>
+                            <ul class="mega-menu__list">
+                              {%- for grandchild in child.links -%}
+                                <li><a href="{{ grandchild.url }}"{% if grandchild.active %} aria-current="page"{% endif %}>{{ grandchild.title }}</a></li>
+                              {%- endfor -%}
+                            </ul>
+                          </div>
+                        {%- endif -%}
+                      {%- endfor -%}
+
+                      <a href="{{ link.url }}" class="mega-menu__view-all link-underline">{{ 'sections.header.view_all' | t }} {{ link.title }}</a>
+                    </div>
+
+                    {%- assign card_count = 0 -%}
+                    <div class="mega-menu__cards">
+                      {%- for child in link.links -%}
+                        {%- if child.type == 'collection_link' and child.object.featured_image and card_count < 2 -%}
+                          {%- assign card_count = card_count | plus: 1 -%}
+                          <a href="{{ child.url }}" class="mega-menu__card">
+                            {{ child.object.featured_image | image_url: width: 500 | image_tag: loading: 'lazy', sizes: '200px', widths: '250, 400, 500' }}
+                            <span>{{ child.title }}</span>
+                          </a>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                </div>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    </div>
+
+    <div class="site-header__logo">
+      {%- if request.page_type == 'index' -%}<h1 class="site-header__logo-heading">{%- endif -%}
+      <a href="{{ routes.root_url }}" class="site-header__logo-link">
+        {%- if logo -%}
+          {{
+            logo
+            | image_url: width: 600
+            | image_tag:
+              class: 'site-header__logo-image',
+              width: settings.logo_width,
+              height: logo_height,
+              alt: shop.name,
+              style: 'width: var(--logo-width)'
+          }}
+        {%- else -%}
+          <span class="site-header__logo-text">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+      {%- if request.page_type == 'index' -%}</h1>{%- endif -%}
+    </div>
+
+    <div class="site-header__right">
+      <div class="site-header__utility">
+        {%- if whatsapp_url != blank -%}
+          <a href="{{ whatsapp_url }}" class="site-header__utility-link" target="_blank" rel="noopener">
+            {%- render 'icon', name: 'whatsapp' -%}
+            <span>{{ 'sections.header.support' | t }}</span>
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_localization and localization.available_countries.size > 1 -%}
+        {%- form 'localization', class: 'site-header__localization' -%}
+          <label class="visually-hidden" for="HeaderCountry">{{ 'sections.header.country' | t }}</label>
+          <select id="HeaderCountry" name="country_code" onchange="this.form.submit()">
+            {%- for country in localization.available_countries -%}
+              <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+                {{ country.iso_code }} | {{ country.currency.symbol }}
+              </option>
+            {%- endfor -%}
+          </select>
+        {%- endform -%}
+      {%- endif -%}
+
+      <button type="button" class="site-header__icon" data-search-open aria-controls="SearchDrawer" aria-expanded="false">
+        {%- render 'icon', name: 'search' -%}
+        <span class="visually-hidden">{{ 'general.search.title' | t }}</span>
+      </button>
+
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="site-header__icon site-header__account">
+          {%- render 'icon', name: 'account' -%}
+          <span class="visually-hidden">{{ 'customer.account.title' | t }}</span>
+        </a>
+      {%- endif -%}
+
+      <a href="{{ routes.cart_url }}" class="site-header__icon site-header__cart" data-cart-open>
+        {%- render 'icon', name: 'cart' -%}
+        <span class="visually-hidden">{{ 'sections.cart.title' | t }}</span>
+        <span class="cart-count" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="search-drawer" id="SearchDrawer" hidden>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-drawer__form page-width">
+      <label class="visually-hidden" for="HeaderSearch">{{ 'general.search.title' | t }}</label>
+      <input type="search" id="HeaderSearch" name="q" placeholder="{{ 'general.search.placeholder' | t }}" autocomplete="off">
+      <input type="hidden" name="options[prefix]" value="last">
+      <button type="submit" class="site-header__icon">
+        {%- render 'icon', name: 'search' -%}
+        <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
+      </button>
+      <button type="button" class="site-header__icon" data-search-close>
+        {%- render 'icon', name: 'close' -%}
+        <span class="visually-hidden">{{ 'general.close' | t }}</span>
+      </button>
+    </form>
+  </div>
+</header>
+
+<div class="mobile-menu" id="MobileMenu" aria-hidden="true">
+  <div class="mobile-menu__overlay" data-menu-close></div>
+  <div class="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="{{ 'sections.header.menu' | t }}">
+    <div class="mobile-menu__header">
+      <button type="button" class="site-header__icon" data-menu-close>
+        {%- render 'icon', name: 'close' -%}
+        <span class="visually-hidden">{{ 'general.close' | t }}</span>
+      </button>
+    </div>
+    <ul class="mobile-menu__list">
+      {%- for link in menu.links -%}
+        <li>
+          {%- if link.links.size > 0 -%}
+            <details>
+              <summary>{{ link.title }} {% render 'icon', name: 'plus' %}</summary>
+              <ul>
+                <li><a href="{{ link.url }}">{{ 'sections.header.view_all' | t }}</a></li>
+                {%- for child in link.links -%}
+                  <li>
+                    <a href="{{ child.url }}">{{ child.title }}</a>
+                    {%- if child.links.size > 0 -%}
+                      <ul>
+                        {%- for grandchild in child.links -%}
+                          <li><a href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- else -%}
+            <a href="{{ link.url }}">{{ link.title }}</a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+    <ul class="mobile-menu__utility">
+      {%- if whatsapp_url != blank -%}
+        <li>
+          <a href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+            {%- render 'icon', name: 'whatsapp' -%}
+            {{ 'sections.header.support' | t }}
+          </a>
+        </li>
+      {%- endif -%}
+    </ul>
+    <div class="mobile-menu__footer">
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
+          {%- if customer -%}{{ 'customer.account.title' | t }}{%- else -%}{{ 'customer.login.title' | t }}{%- endif -%}
+        </a>
+      {%- endif -%}
+      {% render 'social-icons' %}
+    </div>
+  </div>
+</div>
+
+{% style %}
+  :root { --logo-width: {{ settings.logo_width }}px; }
+  @media (max-width: 989px) { :root { --logo-width: {{ settings.logo_width | times: 0.75 | round }}px; } }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Cabeçalho",
+  "class": "section-site-header",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "checkbox", "id": "sticky", "label": "Fixar no topo", "default": true },
+    { "type": "checkbox", "id": "show_localization", "label": "Mostrar seletor de país/moeda", "default": true }
+  ]
+}
+{% endschema %}

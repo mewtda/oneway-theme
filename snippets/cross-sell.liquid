@@ -1,0 +1,73 @@
+{% doc %}
+  Renders complementary products: never the same product type (or category, when type is empty) as the excluded ones,
+  picking one product per type before repeating any type.
+
+  @param {string} exclude_types - Product types to avoid, separated by "|"
+  @param {string} exclude_ids - Product ids to avoid, separated by "|"
+  @param {number} limit - Maximum number of products
+  @param {string} layout - "card" for product cards, "compact" for the cart list
+  @param {collection} [source] - Collection to pick from, defaults to all products
+
+  @example
+  {% render 'cross-sell', exclude_types: product.type, exclude_ids: product.id, limit: 4, layout: 'card' %}
+{% enddoc %}
+{%- liquid
+  assign source_collection = source | default: collections.all
+  assign blocked_types = exclude_types | downcase | prepend: '|' | append: '|'
+  assign blocked_ids = exclude_ids | prepend: '|' | append: '|'
+  assign used_types = blocked_types
+  assign picked_ids = '|'
+  assign picked_count = 0
+
+  for candidate in source_collection.products
+    if picked_count >= limit
+      break
+    endif
+    unless candidate.available
+      continue
+    endunless
+
+    assign candidate_id = '|' | append: candidate.id | append: '|'
+    if blocked_ids contains candidate_id
+      continue
+    endif
+
+    assign candidate_type = candidate.type | default: candidate.category.name | downcase | strip
+    if candidate_type == blank
+      continue
+    endif
+    assign candidate_key = '|' | append: candidate_type | append: '|'
+    if used_types contains candidate_key
+      continue
+    endif
+
+    assign used_types = used_types | append: candidate_type | append: '|'
+    assign picked_ids = picked_ids | append: candidate.id | append: '|'
+    assign picked_count = picked_count | plus: 1
+    render 'cross-sell-item', product: candidate, layout: layout
+  endfor
+
+  for candidate in source_collection.products
+    if picked_count >= limit
+      break
+    endif
+    unless candidate.available
+      continue
+    endunless
+
+    assign candidate_id = '|' | append: candidate.id | append: '|'
+    if blocked_ids contains candidate_id or picked_ids contains candidate_id
+      continue
+    endif
+
+    assign candidate_type = candidate.type | default: candidate.category.name | downcase | strip
+    assign candidate_key = '|' | append: candidate_type | append: '|'
+    if candidate_type != blank and blocked_types contains candidate_key
+      continue
+    endif
+
+    assign picked_ids = picked_ids | append: candidate.id | append: '|'
+    assign picked_count = picked_count | plus: 1
+    render 'cross-sell-item', product: candidate, layout: layout
+  endfor
+-%}

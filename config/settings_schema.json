@@ -1,0 +1,315 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "One Way",
+    "theme_version": "1.0.0",
+    "theme_author": "Mewtda",
+    "theme_documentation_url": "https://www.mewtda.com.br",
+    "theme_support_url": "https://www.mewtda.com.br"
+  },
+  {
+    "name": "Logo",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo"
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_inverse",
+        "label": "Logo para fundos escuros"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "label": "Largura do logo",
+        "min": 60,
+        "max": 300,
+        "step": 5,
+        "unit": "px",
+        "default": 140
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Recomendado 32 x 32px"
+      }
+    ]
+  },
+  {
+    "name": "Cores",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "Fundo",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_background_alt",
+        "label": "Fundo secundário",
+        "default": "#F6F6F6"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "Texto",
+        "default": "#121212"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Botões",
+        "default": "#000000"
+      },
+      {
+        "type": "color",
+        "id": "color_accent_text",
+        "label": "Texto dos botões",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_sale",
+        "label": "Preço promocional",
+        "default": "#C8102E"
+      },
+      {
+        "type": "color",
+        "id": "color_announcement_bg",
+        "label": "Barra de anúncio - fundo",
+        "default": "#F3F3F3"
+      },
+      {
+        "type": "color",
+        "id": "color_announcement_text",
+        "label": "Barra de anúncio - texto",
+        "default": "#121212"
+      },
+      {
+        "type": "color",
+        "id": "color_footer_bg",
+        "label": "Rodapé - fundo",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_footer_text",
+        "label": "Rodapé - texto",
+        "default": "#121212"
+      }
+    ]
+  },
+  {
+    "name": "Tipografia",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Use fontes sem serifa para manter a identidade da One Way."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Fonte do texto",
+        "default": "inter_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "Fonte dos títulos",
+        "default": "inter_n4"
+      },
+      {
+        "type": "checkbox",
+        "id": "heading_uppercase",
+        "label": "Títulos em caixa alta",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "heading_letter_spacing",
+        "label": "Espaçamento das letras dos títulos",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "%",
+        "default": 4,
+        "info": "Em décimos de em (4 = 0,04em)"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "label": "Largura máxima da página",
+        "min": 1000,
+        "max": 1800,
+        "step": 20,
+        "unit": "px",
+        "default": 1680
+      }
+    ]
+  },
+  {
+    "name": "Cards de produto",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "Proporção da imagem",
+        "options": [
+          {
+            "value": "2 / 3",
+            "label": "Retrato alongado (2:3)"
+          },
+          {
+            "value": "3 / 4",
+            "label": "Retrato (3:4)"
+          },
+          {
+            "value": "4 / 5",
+            "label": "Retrato (4:5)"
+          },
+          {
+            "value": "1 / 1",
+            "label": "Quadrado"
+          }
+        ],
+        "default": "2 / 3"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_gallery",
+        "label": "Mostrar todas as fotos com navegação",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "card_video_metafield",
+        "label": "Metafield que libera vídeo no card",
+        "info": "Formato namespace.chave. O vídeo aparece no card quando o valor for Sim/Verdadeiro.",
+        "default": "custom.mostrar_video"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_second_image",
+        "label": "Mostrar segunda imagem no hover",
+        "info": "Usado quando a navegação de fotos está desligada",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_sizes",
+        "label": "Mostrar tamanhos disponíveis",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "card_size_option_names",
+        "label": "Nomes da opção de tamanho",
+        "info": "Separados por vírgula",
+        "default": "Tamanho,Size,Talla"
+      }
+    ]
+  },
+  {
+    "name": "Carrinho",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "Tipo de carrinho",
+        "options": [
+          {
+            "value": "drawer",
+            "label": "Gaveta lateral"
+          },
+          {
+            "value": "page",
+            "label": "Página"
+          }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_note",
+        "label": "Permitir observação no pedido",
+        "default": false
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Frete grátis a partir de (R$)",
+        "info": "0 esconde a barra de progresso do carrinho",
+        "default": 499
+      }
+    ]
+  },
+  {
+    "name": "Atendimento",
+    "settings": [
+      {
+        "type": "text",
+        "id": "whatsapp_number",
+        "label": "WhatsApp",
+        "info": "Com DDI e DDD, ex.: 55 31 99999-9999"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_message",
+        "label": "Mensagem inicial",
+        "default": "Olá! Vim pelo site da One Way e gostaria de atendimento."
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_floating",
+        "label": "Mostrar botão flutuante",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "whatsapp_floating_color",
+        "label": "Cor do botão flutuante",
+        "default": "#25D366"
+      }
+    ]
+  },
+  {
+    "name": "Redes sociais",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram",
+        "placeholder": "https://instagram.com/lojaoneway"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok",
+        "label": "TikTok"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook",
+        "label": "Facebook"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest",
+        "label": "Pinterest"
+      }
+    ]
+  }
+]

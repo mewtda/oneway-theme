@@ -1,0 +1,27 @@
+<section class="main-cart page-width section-spacing" data-main-cart data-section-id="{{ section.id }}">
+  <h1 class="page-title">{{ 'sections.cart.title' | t }}</h1>
+  {%- if cart.item_count > 0 -%}
+    <div class="main-cart__grid">
+      <div class="main-cart__items">
+        {% render 'free-shipping-bar' %}
+        {% render 'cart-items' %}
+        {% render 'cart-recommendations', limit: 4 %}
+      </div>
+      <aside class="main-cart__summary">
+        {% render 'cart-summary' %}
+      </aside>
+    </div>
+  {%- else -%}
+    <div class="empty-state">
+      <p>{{ 'sections.cart.empty' | t }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'sections.cart.continue_shopping' | t }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Carrinho",
+  "class": "section-main-cart"
+}
+{% endschema %}

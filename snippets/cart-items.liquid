@@ -1,0 +1,46 @@
+{% doc %}
+  Renders the list of line items in the cart, used by the drawer and the cart page.
+
+  @example
+  {% render 'cart-items' %}
+{% enddoc %}
+<ul class="cart-items">
+  {%- for item in cart.items -%}
+    <li class="cart-item" data-line="{{ forloop.index }}">
+      <a href="{{ item.url }}" class="cart-item__media">
+        {%- if item.image -%}
+          {{ item.image | image_url: width: 300 | image_tag: loading: 'lazy', alt: item.image.alt, widths: '150, 300', sizes: '120px' }}
+        {%- endif -%}
+      </a>
+      <div class="cart-item__details">
+        <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
+        {%- unless item.product.has_only_default_variant -%}
+          <p class="cart-item__variant">{{ item.variant.title }}</p>
+        {%- endunless -%}
+        {%- for property in item.properties -%}
+          {%- assign first_char = property.first | slice: 0 -%}
+          {%- if property.last != blank and first_char != '_' -%}
+            <p class="cart-item__variant">{{ property.first }}: {{ property.last }}</p>
+          {%- endif -%}
+        {%- endfor -%}
+        {%- for discount in item.line_level_discount_allocations -%}
+          <p class="cart-item__discount">{{ discount.discount_application.title }} (-{{ discount.amount | money }})</p>
+        {%- endfor -%}
+        <div class="cart-item__actions">
+          <div class="quantity quantity--small">
+            <button type="button" class="quantity__button" data-cart-qty="{{ item.quantity | minus: 1 }}" data-line="{{ forloop.index }}" aria-label="{{ 'products.product.quantity_decrease' | t }}">{% render 'icon', name: 'minus' %}</button>
+            <span class="quantity__value">{{ item.quantity }}</span>
+            <button type="button" class="quantity__button" data-cart-qty="{{ item.quantity | plus: 1 }}" data-line="{{ forloop.index }}" aria-label="{{ 'products.product.quantity_increase' | t }}">{% render 'icon', name: 'plus' %}</button>
+          </div>
+          <button type="button" class="cart-item__remove link-underline" data-cart-qty="0" data-line="{{ forloop.index }}">{{ 'sections.cart.remove' | t }}</button>
+        </div>
+      </div>
+      <div class="cart-item__price">
+        {%- if item.original_line_price > item.final_line_price -%}
+          <s class="price__compare">{{ item.original_line_price | money }}</s>
+        {%- endif -%}
+        <span>{{ item.final_line_price | money }}</span>
+      </div>
+    </li>
+  {%- endfor -%}
+</ul>

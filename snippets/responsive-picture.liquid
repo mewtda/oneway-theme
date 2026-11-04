@@ -1,0 +1,45 @@
+{% doc %}
+  Renders a <picture> with an optional mobile crop and reserved space (width/height) on each breakpoint.
+
+  @param {image} image - Desktop image
+  @param {image} [image_mobile] - Image used below 750px
+  @param {string} [sizes] - Sizes attribute, defaults to 100vw
+  @param {string} [loading] - lazy (default) or eager
+  @param {string} [class] - Class for the img element
+  @param {string} [alt] - Alternative text, defaults to the image alt
+
+  @example
+  {% render 'responsive-picture', image: block.settings.image, image_mobile: block.settings.image_mobile, loading: 'eager' %}
+{% enddoc %}
+{%- liquid
+  assign sizes_attr = sizes | default: '100vw'
+  assign loading_attr = loading | default: 'lazy'
+  assign priority = 'auto'
+  if loading_attr == 'eager'
+    assign priority = 'high'
+  endif
+  assign alt_text = alt | default: image.alt | default: image_mobile.alt | escape
+  assign desktop = image | default: image_mobile
+-%}
+<picture>
+  {%- if image_mobile and image -%}
+    <source
+      media="(max-width: 749px)"
+      srcset="{{ image_mobile | image_url: width: 400 }} 400w, {{ image_mobile | image_url: width: 600 }} 600w, {{ image_mobile | image_url: width: 800 }} 800w, {{ image_mobile | image_url: width: 1000 }} 1000w, {{ image_mobile | image_url: width: 1200 }} 1200w"
+      sizes="100vw"
+      width="{{ image_mobile.width }}"
+      height="{{ image_mobile.height }}"
+    >
+  {%- endif -%}
+  {{
+    desktop
+    | image_url: width: 3000
+    | image_tag:
+      class: class,
+      widths: '400, 600, 800, 1000, 1300, 1600, 2000, 2500, 3000',
+      sizes: sizes_attr,
+      loading: loading_attr,
+      fetchpriority: priority,
+      alt: alt_text
+  }}
+</picture>

@@ -1,0 +1,169 @@
+{%- liquid
+  assign section_index = section.index | default: 99
+-%}
+<section class="banner-entries banner-entries--gap-{{ section.settings.gap }}{% if section.settings.full_width == false %} page-width{% endif %}" style="--banner-text: {{ section.settings.text_color }}; --banner-overlay: {{ section.settings.overlay | divided_by: 100.0 }};">
+  {%- if section.settings.heading != blank -%}
+    <div class="section-header{% if section.settings.full_width %} page-width{% endif %}">
+      <h2 class="section-header__title">{{ section.settings.heading }}</h2>
+    </div>
+  {%- endif -%}
+
+  <div class="banner-entries__grid banner-entries__grid--mobile-{{ section.settings.columns_mobile }}">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign loading = 'lazy'
+        if section_index <= 2 and forloop.index <= 2
+          assign loading = 'eager'
+        endif
+        assign sizes = '(min-width: 750px) 50vw, 100vw'
+        if block.settings.desktop_width == 'full'
+          assign sizes = '100vw'
+        elsif block.settings.desktop_width == 'third'
+          assign sizes = '(min-width: 750px) 33vw, 100vw'
+        endif
+        if section.settings.columns_mobile == '2'
+          assign sizes = sizes | replace: ', 100vw', ', 50vw'
+        endif
+        assign title = block.settings.title | default: block.settings.collection.title
+        assign link = block.settings.link | default: block.settings.collection.url
+      -%}
+      <div
+        class="banner-entry banner-entry--{{ block.settings.desktop_width }} banner-entry--text-{{ block.settings.text_position }}"
+        style="--ratio-desktop: {{ block.settings.ratio_desktop }}; --ratio-mobile: {{ block.settings.ratio_mobile }};"
+        {{ block.shopify_attributes }}
+      >
+        <a href="{{ link | default: '#' }}" class="banner-entry__link"{% if title != blank %} aria-label="{{ title | escape }}"{% endif %}>
+          <div class="banner-entry__media">
+            {%- assign fallback_image = block.settings.collection.featured_image -%}
+            {%- if block.settings.image or block.settings.image_mobile -%}
+              {% render 'responsive-picture', image: block.settings.image, image_mobile: block.settings.image_mobile, sizes: sizes, loading: loading, class: 'banner-entry__image', alt: title %}
+            {%- elsif fallback_image -%}
+              {% render 'responsive-picture', image: fallback_image, sizes: sizes, loading: loading, class: 'banner-entry__image', alt: title %}
+            {%- else -%}
+              {{ 'lifestyle-2' | placeholder_svg_tag: 'banner-entry__image placeholder' }}
+            {%- endif -%}
+          </div>
+          <div class="banner-entry__content">
+            {%- if block.settings.eyebrow != blank -%}
+              <p class="banner-entry__eyebrow">{{ block.settings.eyebrow }}</p>
+            {%- endif -%}
+            {%- if title != blank -%}
+              <h3 class="banner-entry__title">{{ title }}</h3>
+            {%- endif -%}
+            {%- if block.settings.button_label != blank -%}
+              <span class="banner-entry__cta">{{ block.settings.button_label }}</span>
+            {%- endif -%}
+          </div>
+        </a>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Banners de seleção",
+  "class": "section-banner-entries",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título (opcional)" },
+    { "type": "checkbox", "id": "full_width", "label": "Largura total da tela", "default": true },
+    {
+      "type": "select",
+      "id": "gap",
+      "label": "Espaço entre banners",
+      "options": [
+        { "value": "none", "label": "Sem espaço" },
+        { "value": "small", "label": "Pequeno" },
+        { "value": "medium", "label": "Médio" }
+      ],
+      "default": "small"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Colunas no celular",
+      "options": [
+        { "value": "1", "label": "1 (um banner por linha)" },
+        { "value": "2", "label": "2" }
+      ],
+      "default": "1"
+    },
+    { "type": "color", "id": "text_color", "label": "Cor do texto", "default": "#FFFFFF" },
+    { "type": "range", "id": "overlay", "label": "Escurecer imagem", "min": 0, "max": 60, "step": 5, "unit": "%", "default": 10 }
+  ],
+  "blocks": [
+    {
+      "type": "banner",
+      "name": "Banner",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Imagem desktop", "info": "Recomendado 1600 x 2000px (meia largura) ou 2880 x 1400px (largura total)" },
+        { "type": "image_picker", "id": "image_mobile", "label": "Imagem celular", "info": "Recorte próprio para celular. Recomendado 1200 x 1600px" },
+        { "type": "collection", "id": "collection", "label": "Coleção", "info": "Preenche título, link e imagem quando os campos estiverem vazios" },
+        { "type": "text", "id": "eyebrow", "label": "Texto acima do título" },
+        { "type": "text", "id": "title", "label": "Título curto" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "button_label", "label": "Texto do link", "default": "Ver seleção" },
+        {
+          "type": "select",
+          "id": "desktop_width",
+          "label": "Largura no desktop",
+          "options": [
+            { "value": "full", "label": "Inteira" },
+            { "value": "half", "label": "Metade" },
+            { "value": "third", "label": "Um terço" }
+          ],
+          "default": "half"
+        },
+        {
+          "type": "select",
+          "id": "ratio_desktop",
+          "label": "Formato no desktop",
+          "options": [
+            { "value": "4 / 5", "label": "Retrato (4:5)" },
+            { "value": "2 / 3", "label": "Retrato alongado (2:3)" },
+            { "value": "1 / 1", "label": "Quadrado" },
+            { "value": "16 / 9", "label": "Paisagem (16:9)" },
+            { "value": "21 / 9", "label": "Panorâmico (21:9)" }
+          ],
+          "default": "4 / 5"
+        },
+        {
+          "type": "select",
+          "id": "ratio_mobile",
+          "label": "Formato no celular",
+          "options": [
+            { "value": "3 / 4", "label": "Retrato (3:4)" },
+            { "value": "4 / 5", "label": "Retrato (4:5)" },
+            { "value": "2 / 3", "label": "Retrato alongado (2:3)" },
+            { "value": "1 / 1", "label": "Quadrado" }
+          ],
+          "default": "4 / 5"
+        },
+        {
+          "type": "select",
+          "id": "text_position",
+          "label": "Posição do texto",
+          "options": [
+            { "value": "center", "label": "Centro" },
+            { "value": "bottom-center", "label": "Embaixo, centralizado" },
+            { "value": "bottom-left", "label": "Embaixo, à esquerda" },
+            { "value": "below", "label": "Abaixo da imagem" }
+          ],
+          "default": "bottom-center"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banners de seleção",
+      "blocks": [
+        { "type": "banner", "settings": { "title": "Party Collection", "link": "shopify://collections/party" } },
+        { "type": "banner", "settings": { "title": "Beachwear", "link": "shopify://collections/beachwear" } },
+        { "type": "banner", "settings": { "title": "Conjuntos", "link": "shopify://collections/conjunto" } },
+        { "type": "banner", "settings": { "title": "Acessórios", "link": "shopify://collections/acessorios" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

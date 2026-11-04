@@ -1,0 +1,38 @@
+{% doc %}
+  Editorial banner rendered inside the collection grid.
+
+  @param {block} block - "editorial" block of the main-collection section
+  @param {number} [index] - Position in the grid, used to decide lazy loading
+
+  @example
+  {% render 'editorial-banner', block: block %}
+{% enddoc %}
+{%- liquid
+  assign loading = 'lazy'
+  if index < 2
+    assign loading = 'eager'
+  endif
+  assign sizes = '100vw'
+  if block.settings.desktop_width == 'half'
+    assign sizes = '(min-width: 990px) 50vw, 100vw'
+  endif
+  assign title = block.settings.title
+-%}
+<div class="ed-grid__item ed-grid__item--editorial ed-grid__item--editorial-{{ block.settings.desktop_width }}" style="--banner-text: {{ block.settings.text_color }};" data-grid-item {{ block.shopify_attributes }}>
+  <a href="{{ block.settings.link | default: '#' }}" class="editorial-banner"{% if title != blank %} aria-label="{{ title | escape }}"{% endif %}>
+    <div class="editorial-banner__media">
+      {%- if block.settings.video -%}
+        {{ block.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: false, preload: 'metadata', class: 'editorial-banner__image', image_size: '1600x' }}
+      {%- elsif block.settings.image or block.settings.image_mobile -%}
+        {% render 'responsive-picture', image: block.settings.image, image_mobile: block.settings.image_mobile, sizes: sizes, loading: loading, class: 'editorial-banner__image', alt: title %}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'editorial-banner__image placeholder' }}
+      {%- endif -%}
+    </div>
+    <div class="editorial-banner__content">
+      {%- if block.settings.eyebrow != blank -%}<p class="editorial-banner__eyebrow">{{ block.settings.eyebrow }}</p>{%- endif -%}
+      {%- if title != blank -%}<h2 class="editorial-banner__title">{{ title }}</h2>{%- endif -%}
+      {%- if block.settings.button_label != blank -%}<span class="editorial-banner__cta">{{ block.settings.button_label }}</span>{%- endif -%}
+    </div>
+  </a>
+</div>

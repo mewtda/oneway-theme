@@ -1,0 +1,252 @@
+<footer class="site-footer">
+  <div class="site-footer__inner page-width">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a href="{{ routes.root_url }}" class="site-footer__logo">
+          {%- liquid
+            assign footer_logo = settings.logo
+            assign logo_class = 'site-footer__logo-image'
+            if section.settings.use_inverse_logo
+              if settings.logo_inverse
+                assign footer_logo = settings.logo_inverse
+              else
+                assign logo_class = 'site-footer__logo-image site-footer__logo-image--invert'
+              endif
+            endif
+          -%}
+          {%- if footer_logo -%}
+            {{ footer_logo | image_url: width: 400 | image_tag: loading: 'lazy', alt: shop.name, class: logo_class, style: 'width: var(--logo-width)' }}
+          {%- else -%}
+            <span class="site-footer__logo-text">{{ shop.name }}</span>
+          {%- endif -%}
+        </a>
+        {%- if section.settings.text != blank -%}
+          <div class="site-footer__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+        {% render 'social-icons' %}
+      </div>
+
+      <div class="site-footer__menus">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'menu' -%}
+              <details class="site-footer__menu" open {{ block.shopify_attributes }}>
+                <summary class="site-footer__heading">
+                  {{- block.settings.heading | default: block.settings.menu.title -}}
+                  {% render 'icon', name: 'plus' %}
+                </summary>
+                <ul>
+                  {%- for link in block.settings.menu.links -%}
+                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              </details>
+            {%- when 'contact' -%}
+              {%- liquid
+                capture whatsapp_url
+                  render 'whatsapp-url'
+                endcapture
+                assign phone_digits = settings.whatsapp_number | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '+' | remove: '.'
+                assign phone_label = settings.whatsapp_number
+                if phone_digits.size == 13
+                  assign phone_area = phone_digits | slice: 2, 2
+                  assign phone_first = phone_digits | slice: 4, 5
+                  assign phone_last = phone_digits | slice: 9, 4
+                  assign phone_label = '(' | append: phone_area | append: ') ' | append: phone_first | append: '-' | append: phone_last
+                endif
+                assign directions_query = block.settings.address | strip_html | url_encode
+              -%}
+              <details class="site-footer__menu" open {{ block.shopify_attributes }}>
+                <summary class="site-footer__heading">
+                  {{- block.settings.heading -}}
+                  {% render 'icon', name: 'plus' %}
+                </summary>
+                <ul class="site-footer__contact">
+                  {%- if block.settings.address != blank -%}
+                    <li>
+                      {%- render 'icon', name: 'store' -%}
+                      <a href="https://www.google.com/maps/dir/?api=1&destination={{ directions_query }}" target="_blank" rel="noopener">{{ block.settings.address }}</a>
+                    </li>
+                  {%- endif -%}
+                  {%- if whatsapp_url != blank -%}
+                    <li>
+                      {%- render 'icon', name: 'whatsapp' -%}
+                      <a href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+                        {{- phone_label -}}
+                      </a>
+                    </li>
+                  {%- endif -%}
+                  {%- if block.settings.show_email and shop.email != blank -%}
+                    <li>
+                      {%- render 'icon', name: 'mail' -%}
+                      <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>
+                    </li>
+                  {%- endif -%}
+                  {%- if block.settings.hours != blank -%}
+                    <li class="site-footer__hours">{{ block.settings.hours }}</li>
+                  {%- endif -%}
+                </ul>
+              </details>
+            {%- when 'account' -%}
+              <details class="site-footer__menu" open {{ block.shopify_attributes }}>
+                <summary class="site-footer__heading">
+                  {{- block.settings.heading -}}
+                  {% render 'icon', name: 'plus' %}
+                </summary>
+                <ul>
+                  {%- if shop.customer_accounts_enabled -%}
+                    {%- if customer -%}
+                      <li><a href="{{ routes.account_url }}">{{ 'customer.account.my_account' | t }}</a></li>
+                      <li><a href="{{ routes.account_url }}">{{ 'customer.account.my_orders' | t }}</a></li>
+                      <li><a href="{{ routes.account_addresses_url }}">{{ 'customer.account.my_addresses' | t }}</a></li>
+                      <li><a href="{{ routes.account_logout_url }}">{{ 'customer.account.log_out' | t }}</a></li>
+                    {%- else -%}
+                      <li><a href="{{ routes.account_login_url }}">{{ 'customer.account.my_account' | t }}</a></li>
+                      <li><a href="{{ routes.account_login_url }}">{{ 'customer.account.my_orders' | t }}</a></li>
+                      {%- if routes.account_register_url -%}
+                        <li><a href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a></li>
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endif -%}
+                  <li><a href="{{ routes.cart_url }}">{{ 'customer.account.my_cart' | t }}</a></li>
+                  {%- for link in block.settings.menu.links -%}
+                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              </details>
+            {%- when 'text' -%}
+              <div class="site-footer__menu site-footer__menu--text" {{ block.shopify_attributes }}>
+                <p class="site-footer__heading">{{ block.settings.heading }}</p>
+                <div class="rte">{{ block.settings.text }}</div>
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- assign custom_badges = section.blocks | where: 'type', 'badge' -%}
+    <div class="site-footer__trust">
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <div class="site-footer__trust-group">
+          <p class="site-footer__heading">{{ 'sections.footer.payment_methods' | t }}</p>
+          <ul class="site-footer__payments">
+            {%- for type in shop.enabled_payment_types -%}
+              <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      <div class="site-footer__trust-group">
+        <p class="site-footer__heading">{{ 'sections.footer.security' | t }}</p>
+        <ul class="trust-badges">
+          {%- if section.settings.show_ssl -%}
+            <li class="trust-badge">
+              {%- render 'icon', name: 'shield-lock' -%}
+              <span class="trust-badge__text">
+                <small>{{ 'sections.footer.ssl_label' | t }}</small>
+                <strong>{{ 'sections.footer.ssl_title' | t }}</strong>
+              </span>
+            </li>
+          {%- endif -%}
+          {%- if section.settings.show_shopify -%}
+            <li class="trust-badge">
+              {%- render 'icon', name: 'shield-check' -%}
+              <span class="trust-badge__text">
+                <small>{{ 'sections.footer.shopify_label' | t }}</small>
+                <strong>{{ 'sections.footer.shopify_title' | t }}</strong>
+              </span>
+            </li>
+          {%- endif -%}
+          {%- for block in custom_badges -%}
+            <li class="trust-badge trust-badge--image" {{ block.shopify_attributes }}>
+              {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" target="_blank" rel="noopener">{%- endif -%}
+              {%- if block.settings.image -%}
+                {{ block.settings.image | image_url: height: 96 | image_tag: loading: 'lazy', alt: block.settings.alt | default: block.settings.image.alt, height: 40 }}
+              {%- elsif block.settings.alt != blank -%}
+                <span class="trust-badge__text"><strong>{{ block.settings.alt }}</strong></span>
+              {%- endif -%}
+              {%- if block.settings.link != blank -%}</a>{%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'sections.footer.rights' | t }}
+      </p>
+
+
+      <a href="https://www.mewtda.com.br" target="_blank" rel="noopener" class="site-footer__credits">
+        <span>{{ 'sections.footer.developed_by' | t }}</span>
+        <img src="{{ 'mewtda-logo.png' | asset_url }}" alt="Mewtda" width="87" height="28" loading="lazy">
+      </a>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Rodapé",
+  "class": "section-footer",
+  "max_blocks": 10,
+  "settings": [
+    { "type": "richtext", "id": "text", "label": "Texto da marca" },
+    { "type": "checkbox", "id": "use_inverse_logo", "label": "Usar logo para fundos escuros", "default": true },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Mostrar formas de pagamento", "default": true },
+    { "type": "header", "content": "Selos de segurança" },
+    { "type": "checkbox", "id": "show_ssl", "label": "Site seguro SSL", "default": true },
+    { "type": "checkbox", "id": "show_shopify", "label": "Loja protegida pela Shopify", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Texto",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Atendimento" },
+        { "type": "richtext", "id": "text", "label": "Texto", "default": "<p>Seg a sex, das 9h às 18h.</p>" }
+      ]
+    },
+    {
+      "type": "contact",
+      "name": "Atendimento",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Atendimento" },
+        { "type": "text", "id": "address", "label": "Endereço da loja", "info": "Abre o Como chegar no Google Maps" },
+        { "type": "checkbox", "id": "show_email", "label": "Mostrar e-mail da loja", "default": true },
+        { "type": "text", "id": "hours", "label": "Horário de atendimento" },
+        { "type": "paragraph", "content": "O WhatsApp vem de Configurações do tema → Atendimento." }
+      ]
+    },
+    {
+      "type": "account",
+      "name": "Minha conta",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Título", "default": "Sobre" },
+        { "type": "link_list", "id": "menu", "label": "Links extras", "info": "Adicionados após Minha conta, Meus pedidos e Carrinho" }
+      ]
+    },
+    {
+      "type": "badge",
+      "name": "Selo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Imagem do selo" },
+        { "type": "text", "id": "alt", "label": "Nome do selo", "info": "Ex.: Reclame Aqui, Google Site Seguro" },
+        { "type": "url", "id": "link", "label": "Link de verificação" }
+      ]
+    }
+  ]
+}
+{% endschema %}

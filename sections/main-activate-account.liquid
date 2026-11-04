@@ -1,0 +1,25 @@
+<section class="customer section-spacing">
+  <div class="customer__inner">
+    <h1 class="page-title">{{ 'customer.activate_account.title' | t }}</h1>
+    {%- form 'activate_customer_password', class: 'form' -%}
+      {{ form.errors | default_errors }}
+      <div class="field">
+        <label for="ActivatePassword">{{ 'customer.login.password' | t }}</label>
+        <input type="password" id="ActivatePassword" name="customer[password]" autocomplete="new-password" required>
+      </div>
+      <div class="field">
+        <label for="ActivatePasswordConfirm">{{ 'customer.reset_password.confirm' | t }}</label>
+        <input type="password" id="ActivatePasswordConfirm" name="customer[password_confirmation]" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="button button--full">{{ 'customer.activate_account.submit' | t }}</button>
+      <button type="submit" name="decline" class="button button--outline button--full">{{ 'customer.activate_account.decline' | t }}</button>
+    {%- endform -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Ativar conta",
+  "class": "section-main-activate-account"
+}
+{% endschema %}
