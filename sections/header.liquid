@@ -6,9 +6,23 @@
     assign logo_height = settings.logo_width | divided_by: logo.aspect_ratio | round
   endif
 
+  assign bg_style = section.settings.background_style
+  assign overlay = false
+  if bg_style == 'transparent' and request.page_type == 'index'
+    assign overlay = true
+  elsif bg_style == 'transparent'
+    assign bg_style = 'blur'
+  endif
+  assign logo_overlay = settings.logo_inverse
+  assign overlay_brightness = section.settings.overlay_text_color | color_brightness
+
 -%}
 {%- capture whatsapp_url -%}{% render 'whatsapp-url' %}{%- endcapture -%}
-<header class="site-header{% if section.settings.sticky %} site-header--sticky{% endif %}" data-header>
+<header
+  class="site-header site-header--stacked site-header--bg-{{ bg_style }}{% if section.settings.sticky %} site-header--sticky{% endif %}{% if overlay %} site-header--overlay is-transparent{% endif %}{% if section.settings.mobile_nav %} site-header--mobile-nav{% endif %}{% if overlay_brightness > 150 %} site-header--invert-logo{% endif %}"
+  style="--header-overlay-text: {{ section.settings.overlay_text_color }}; --header-blur-alpha: {{ section.settings.blur_opacity | divided_by: 100.0 }}; --header-bg-rgb: {{ settings.color_background.red }}, {{ settings.color_background.green }}, {{ settings.color_background.blue }};"
+  data-header
+>
   <div class="site-header__inner page-width">
     <div class="site-header__left">
       <button type="button" class="site-header__icon site-header__menu-toggle" aria-controls="MobileMenu" aria-expanded="false" data-menu-open>
@@ -16,80 +30,16 @@
         <span class="visually-hidden">{{ 'sections.header.menu' | t }}</span>
       </button>
 
-      <nav class="site-nav" aria-label="{{ 'sections.header.menu' | t }}">
-        <ul class="site-nav__list">
-          {%- for link in menu.links -%}
-            <li class="site-nav__item{% if link.links.size > 0 %} site-nav__item--has-dropdown{% endif %}">
-              <a href="{{ link.url }}" class="site-nav__link{% if link.active or link.child_active %} is-active{% endif %}"{% if link.links.size > 0 %} aria-haspopup="true"{% endif %}>
-                {{- link.title -}}
-              </a>
-              {%- if link.links.size > 0 -%}
-                {%- liquid
-                  assign flat_count = 0
-                  for child in link.links
-                    if child.links.size == 0
-                      assign flat_count = flat_count | plus: 1
-                    endif
-                  endfor
-                  assign flat_span = flat_count | divided_by: 8.0 | ceil | at_most: 3 | at_least: 1
-                -%}
-                <div class="mega-menu">
-                  <div class="mega-menu__inner page-width">
-                    <div class="mega-menu__links">
-                      {%- if flat_count > 0 -%}
-                        <div class="mega-menu__group mega-menu__group--span-{{ flat_span }}">
-                          <a href="{{ link.url }}" class="mega-menu__heading">{{ link.title }}</a>
-                          <ul class="mega-menu__list">
-                            {%- for child in link.links -%}
-                              {%- if child.links.size == 0 -%}
-                                <li><a href="{{ child.url }}"{% if child.active %} aria-current="page"{% endif %}>{{ child.title }}</a></li>
-                              {%- endif -%}
-                            {%- endfor -%}
-                          </ul>
-                        </div>
-                      {%- endif -%}
+      <button type="button" class="site-header__icon site-header__search-toggle" data-search-open aria-controls="SearchDrawer" aria-expanded="false">
+        {%- render 'icon', name: 'search' -%}
+        <span class="visually-hidden">{{ 'general.search.title' | t }}</span>
+      </button>
 
-                      {%- for child in link.links -%}
-                        {%- if child.links.size > 0 -%}
-                          {%- assign group_span = child.links.size | divided_by: 8.0 | ceil | at_most: 3 | at_least: 1 -%}
-                          <div class="mega-menu__group mega-menu__group--span-{{ group_span }}">
-                            <a href="{{ child.url }}" class="mega-menu__heading">{{ child.title }}</a>
-                            <ul class="mega-menu__list">
-                              {%- for grandchild in child.links -%}
-                                <li><a href="{{ grandchild.url }}"{% if grandchild.active %} aria-current="page"{% endif %}>{{ grandchild.title }}</a></li>
-                              {%- endfor -%}
-                            </ul>
-                          </div>
-                        {%- endif -%}
-                      {%- endfor -%}
-
-                      <a href="{{ link.url }}" class="mega-menu__view-all link-underline">{{ 'sections.header.view_all' | t }} {{ link.title }}</a>
-                    </div>
-
-                    {%- assign card_count = 0 -%}
-                    <div class="mega-menu__cards">
-                      {%- for child in link.links -%}
-                        {%- if child.type == 'collection_link' and child.object.featured_image and card_count < 2 -%}
-                          {%- assign card_count = card_count | plus: 1 -%}
-                          <a href="{{ child.url }}" class="mega-menu__card">
-                            {{ child.object.featured_image | image_url: width: 500 | image_tag: loading: 'lazy', sizes: '200px', widths: '250, 400, 500' }}
-                            <span>{{ child.title }}</span>
-                          </a>
-                        {%- endif -%}
-                      {%- endfor -%}
-                    </div>
-                  </div>
-                </div>
-              {%- endif -%}
-            </li>
-          {%- endfor -%}
-        </ul>
-      </nav>
     </div>
 
     <div class="site-header__logo">
       {%- if request.page_type == 'index' -%}<h1 class="site-header__logo-heading">{%- endif -%}
-      <a href="{{ routes.root_url }}" class="site-header__logo-link">
+      <a href="{{ routes.root_url }}" class="site-header__logo-link{% if overlay and logo_overlay %} has-overlay-logo{% endif %}">
         {%- if logo -%}
           {{
             logo
@@ -101,6 +51,18 @@
               alt: shop.name,
               style: 'width: var(--logo-width)'
           }}
+          {%- if overlay and logo_overlay -%}
+            {{
+              logo_overlay
+              | image_url: width: 600
+              | image_tag:
+                class: 'site-header__logo-image site-header__logo-image--overlay',
+                width: settings.logo_width,
+                height: logo_height,
+                alt: shop.name,
+                style: 'width: var(--logo-width)'
+            }}
+          {%- endif -%}
         {%- else -%}
           <span class="site-header__logo-text">{{ shop.name }}</span>
         {%- endif -%}
@@ -131,10 +93,6 @@
         {%- endform -%}
       {%- endif -%}
 
-      <button type="button" class="site-header__icon" data-search-open aria-controls="SearchDrawer" aria-expanded="false">
-        {%- render 'icon', name: 'search' -%}
-        <span class="visually-hidden">{{ 'general.search.title' | t }}</span>
-      </button>
 
       {%- if shop.customer_accounts_enabled -%}
         <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="site-header__icon site-header__account">
@@ -150,6 +108,76 @@
       </a>
     </div>
   </div>
+
+    <nav class="site-nav page-width" aria-label="{{ 'sections.header.menu' | t }}">
+      <ul class="site-nav__list">
+        {%- for link in menu.links -%}
+          <li class="site-nav__item{% if link.links.size > 0 %} site-nav__item--has-dropdown{% endif %}">
+            <a href="{{ link.url }}" class="site-nav__link{% if link.active or link.child_active %} is-active{% endif %}"{% if link.links.size > 0 %} aria-haspopup="true"{% endif %}>
+              {{- link.title -}}
+            </a>
+            {%- if link.links.size > 0 -%}
+              {%- liquid
+                assign flat_count = 0
+                for child in link.links
+                  if child.links.size == 0
+                    assign flat_count = flat_count | plus: 1
+                  endif
+                endfor
+                assign flat_span = flat_count | divided_by: 8.0 | ceil | at_most: 3 | at_least: 1
+              -%}
+              <div class="mega-menu">
+                <div class="mega-menu__inner page-width">
+                  <div class="mega-menu__links">
+                    {%- if flat_count > 0 -%}
+                      <div class="mega-menu__group mega-menu__group--span-{{ flat_span }}">
+                        <a href="{{ link.url }}" class="mega-menu__heading">{{ link.title }}</a>
+                        <ul class="mega-menu__list">
+                          {%- for child in link.links -%}
+                            {%- if child.links.size == 0 -%}
+                              <li><a href="{{ child.url }}"{% if child.active %} aria-current="page"{% endif %}>{{ child.title }}</a></li>
+                            {%- endif -%}
+                          {%- endfor -%}
+                        </ul>
+                      </div>
+                    {%- endif -%}
+
+                    {%- for child in link.links -%}
+                      {%- if child.links.size > 0 -%}
+                        {%- assign group_span = child.links.size | divided_by: 8.0 | ceil | at_most: 3 | at_least: 1 -%}
+                        <div class="mega-menu__group mega-menu__group--span-{{ group_span }}">
+                          <a href="{{ child.url }}" class="mega-menu__heading">{{ child.title }}</a>
+                          <ul class="mega-menu__list">
+                            {%- for grandchild in child.links -%}
+                              <li><a href="{{ grandchild.url }}"{% if grandchild.active %} aria-current="page"{% endif %}>{{ grandchild.title }}</a></li>
+                            {%- endfor -%}
+                          </ul>
+                        </div>
+                      {%- endif -%}
+                    {%- endfor -%}
+
+                    <a href="{{ link.url }}" class="mega-menu__view-all link-underline">{{ 'sections.header.view_all' | t }} {{ link.title }}</a>
+                  </div>
+
+                  {%- assign card_count = 0 -%}
+                  <div class="mega-menu__cards">
+                    {%- for child in link.links -%}
+                      {%- if child.type == 'collection_link' and child.object.featured_image and card_count < 2 -%}
+                        {%- assign card_count = card_count | plus: 1 -%}
+                        <a href="{{ child.url }}" class="mega-menu__card">
+                          {{ child.object.featured_image | image_url: width: 500 | image_tag: loading: 'lazy', sizes: '200px', widths: '250, 400, 500' }}
+                          <span>{{ child.title }}</span>
+                        </a>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
 
   <div class="search-drawer" id="SearchDrawer" hidden>
     <form action="{{ routes.search_url }}" method="get" role="search" class="search-drawer__form page-width">
@@ -237,6 +265,22 @@
   "class": "section-site-header",
   "settings": [
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "checkbox", "id": "mobile_nav", "label": "Mostrar menu embaixo do logo no celular", "info": "Linha com os itens principais, com rolagem lateral", "default": true },
+    { "type": "header", "content": "Fundo" },
+    {
+      "type": "select",
+      "id": "background_style",
+      "label": "Estilo do fundo",
+      "options": [
+        { "value": "transparent", "label": "Invisível sobre o banner da home, blur ao rolar" },
+        { "value": "blur", "label": "Blur (vidro fosco)" },
+        { "value": "solid", "label": "Sólido" }
+      ],
+      "default": "transparent",
+      "info": "Fora da home, o modo invisível usa o blur"
+    },
+    { "type": "range", "id": "blur_opacity", "label": "Opacidade do fundo com blur", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 70 },
+    { "type": "color", "id": "overlay_text_color", "label": "Cor do texto quando invisível", "info": "Para o logo, envie também o \"Logo para fundos escuros\" em Configurações do tema", "default": "#FFFFFF" },
     { "type": "checkbox", "id": "sticky", "label": "Fixar no topo", "default": true },
     { "type": "checkbox", "id": "show_localization", "label": "Mostrar seletor de país/moeda", "default": true }
   ]

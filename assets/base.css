@@ -3318,7 +3318,7 @@ h4,
 
 .collection-toolbar {
   position: sticky;
-  top: var(--header-height);
+  top: var(--header-total, var(--header-height));
   z-index: 20;
   margin-bottom: var(--grid-gap);
   background: var(--color-background);
@@ -3918,7 +3918,7 @@ fieldset.filter-group .filter-group__list {
   }
 
   .product__info-inner {
-    top: calc(var(--header-height) + 2rem);
+    top: calc(var(--header-total, var(--header-height)) + 2rem);
     max-width: 26rem;
   }
 }
@@ -4030,4 +4030,146 @@ body.has-sticky-buy .whatsapp-float {
 @media (prefers-reduced-motion: reduce) {
   .feed__ghost { animation: none; }
   .banner-entry__image { transition: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Cabeçalho: logo em cima, menu embaixo; fundo invisível ou blur
+   -------------------------------------------------------------------------- */
+:root {
+  --header-total: 6.25rem;
+}
+
+.site-header {
+  color: var(--color-text);
+  background: var(--color-background);
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease;
+}
+
+.site-header--bg-blur,
+.site-header--overlay {
+  background: rgba(var(--header-bg-rgb), var(--header-blur-alpha));
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+}
+
+.site-header--bg-solid.is-scrolled,
+.site-header--bg-blur.is-scrolled,
+.site-header--overlay.is-scrolled {
+  border-bottom-color: var(--color-border);
+}
+
+/* Estado invisível (topo da home): some ao passar o mouse, focar ou abrir a busca */
+.site-header.is-transparent:not(:hover):not(:focus-within):not(:has(.search-drawer:not([hidden]))) {
+  background: transparent;
+  color: var(--header-overlay-text);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.site-header.is-transparent:not(:hover):not(:focus-within):not(:has(.search-drawer:not([hidden]))) .cart-count {
+  color: #121212;
+}
+
+.site-header__logo-image--overlay {
+  display: none;
+}
+
+.site-header.is-transparent:not(:hover):not(:focus-within):not(:has(.search-drawer:not([hidden]))) .has-overlay-logo .site-header__logo-image {
+  display: none;
+}
+
+.site-header.is-transparent:not(:hover):not(:focus-within):not(:has(.search-drawer:not([hidden]))) .has-overlay-logo .site-header__logo-image--overlay {
+  display: block;
+}
+
+.site-header--invert-logo.is-transparent:not(:hover):not(:focus-within):not(:has(.search-drawer:not([hidden]))) .site-header__logo-link:not(.has-overlay-logo) .site-header__logo-image {
+  filter: brightness(0) invert(1);
+}
+
+/* Home com cabeçalho invisível: o banner sobe por baixo do cabeçalho */
+body:has(.site-header--overlay) #MainContent {
+  margin-top: calc(var(--header-total) * -1);
+}
+
+body:has(.site-header--overlay) .slideshow--full .slideshow__slide {
+  min-height: 100svh;
+}
+
+/* Linha do logo */
+.site-header--stacked .site-header__inner {
+  min-height: 3.5rem;
+}
+
+.site-header--stacked .site-header__logo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+/* Linha do menu, embaixo do logo */
+.site-header--stacked .site-nav {
+  display: none;
+}
+
+.site-header--stacked .site-nav__list {
+  justify-content: center;
+  gap: 2rem;
+}
+
+.site-header--stacked .site-nav__link {
+  min-height: 2.75rem;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  background-position: 0 calc(100% - 0.625rem);
+}
+
+@media (max-width: 989px) {
+  .site-header--mobile-nav .site-nav {
+    display: block;
+    padding: 0;
+  }
+
+  .site-header--mobile-nav .site-nav__list {
+    justify-content: flex-start;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 0 var(--page-gutter);
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+  }
+
+  .site-header--mobile-nav .site-nav__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-header--mobile-nav .site-nav__item {
+    flex-shrink: 0;
+  }
+
+  .site-header--mobile-nav .site-nav__link {
+    min-height: 2.5rem;
+    white-space: nowrap;
+  }
+
+  .site-header--mobile-nav .mega-menu {
+    display: none;
+  }
+}
+
+@media (min-width: 990px) {
+  .site-header--stacked .site-header__inner {
+    min-height: 4.25rem;
+  }
+
+  .site-header--stacked .site-nav {
+    display: block;
+  }
+
+  .site-header--stacked .site-header__search-toggle {
+    margin-left: -0.75rem;
+  }
 }

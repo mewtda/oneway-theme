@@ -747,9 +747,35 @@
   }
   customElements.define('sticky-buy-bar', StickyBuyBar);
 
+  /* ---------- Cabeçalho: altura, transparência e blur ao rolar ---------- */
+  const setupHeaderState = () => {
+    const header = document.querySelector('[data-header]');
+    if (!header) return;
+    const setHeight = () => document.documentElement.style.setProperty('--header-total', `${header.offsetHeight}px`);
+    setHeight();
+    if ('ResizeObserver' in window) new ResizeObserver(setHeight).observe(header);
+
+    const overlay = header.classList.contains('site-header--overlay');
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const scrolled = window.scrollY > 8;
+      header.classList.toggle('is-scrolled', scrolled);
+      if (overlay) header.classList.toggle('is-transparent', !scrolled);
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+    update();
+  };
+
   window.theme.templateName = document.body.className.match(/template-([\w-]+)/)?.[1];
 
   setupHeader();
+  setupHeaderState();
   setupProductForms();
   setupCollectionFilters();
   setupShare();
