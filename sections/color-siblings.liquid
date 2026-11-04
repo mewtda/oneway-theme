@@ -1,0 +1,38 @@
+{%- comment -%}
+  Chamada via Section Rendering API na busca:
+  /search?q=<nome base>&type=product&section_id=color-siblings
+  Devolve os produtos cujo nome base (nome sem a cor) é igual ao buscado.
+{%- endcomment -%}
+{%- liquid
+  assign wanted = search.terms | downcase | split: ' ' | join: ' ' | strip
+-%}
+<div data-color-siblings>
+  {%- if search.performed -%}
+    {%- paginate search.results by 100 -%}
+      {%- for item in search.results -%}
+        {%- if item.object_type == 'product' -%}
+          {%- capture color_info -%}{% render 'product-color', product: item %}{%- endcapture -%}
+          {%- assign info = color_info | strip | split: '::' -%}
+          {%- if info.size == 3 and info[0] == wanted -%}
+            <a
+              href="{{ item.url | split: '?' | first }}"
+              data-sibling
+              data-id="{{ item.id }}"
+              data-color="{{ info[1] | escape }}"
+              data-hex="{{ info[2] | escape }}"
+              data-available="{{ item.available }}"
+              {%- if item.featured_media %} data-image="{{ item.featured_media | image_url: width: 800 }}"{% endif %}
+            >{{ item.title }}</a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endpaginate -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Cores irmãs",
+  "class": "section-color-siblings"
+}
+{% endschema %}

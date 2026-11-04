@@ -114,7 +114,9 @@
       "description": "Descrição",
       "installments": "ou {{ count }}x de {{ value }} sem juros",
       "zoom": "Ampliar foto",
-      "zoom_hint": "Toque na foto para ampliar"
+      "zoom_hint": "Toque na foto para ampliar",
+      "color": "Cor",
+      "other_colors": "Outras cores"
     },
     "feed": {
       "load_more": "Carregar mais"

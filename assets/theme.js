@@ -876,6 +876,128 @@
   }
   customElements.define('product-zoom', ProductZoom);
 
+  /* ---------- Cores irmãs (mesmo nome, cor diferente no final) ----------
+     Busca uma vez por nome base na busca da loja (seção color-siblings)
+     e guarda o resultado na sessão. */
+  const colorCache = new Map();
+  const fetchColorSiblings = (base, searchUrl) => {
+    if (colorCache.has(base)) return colorCache.get(base);
+    const storageKey = `ow:colors:${base}`;
+    let cached = null;
+    try {
+      cached = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+    } catch (error) {
+      cached = null;
+    }
+    const promise = cached
+      ? Promise.resolve(cached)
+      : fetch(`${searchUrl}?${new URLSearchParams({ q: base, type: 'product', 'options[fields]': 'title', section_id: 'color-siblings' })}`)
+          .then((response) => (response.ok ? response.text() : ''))
+          .then((html) => {
+            const list = [...parseHTML(html).querySelectorAll('[data-sibling]')].map((el) => ({
+              id: el.dataset.id,
+              url: el.getAttribute('href'),
+              color: el.dataset.color,
+              hex: el.dataset.hex,
+              available: el.dataset.available === 'true',
+              image: el.dataset.image || ''
+            }));
+            try {
+              sessionStorage.setItem(storageKey, JSON.stringify(list));
+            } catch (error) {
+              /* sem sessionStorage */
+            }
+            return list;
+          })
+          .catch(() => []);
+    colorCache.set(base, promise);
+    return promise;
+  };
+
+  class ColorSwatches extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.ready) return;
+      this.dataset.ready = 'true';
+      if (this.dataset.mode === 'card' && 'IntersectionObserver' in window) {
+        this.observer = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting) return;
+          this.observer.disconnect();
+          this.load();
+        }, { rootMargin: '300px 0px' });
+        this.observer.observe(this);
+      } else {
+        this.load();
+      }
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+    }
+
+    async load() {
+      const siblings = await fetchColorSiblings(this.dataset.base, this.dataset.searchUrl);
+      if (!siblings.some((item) => item.id === this.dataset.current) || siblings.length < 2) {
+        if (this.dataset.mode === 'card') this.classList.add('is-single');
+        return;
+      }
+      const current = siblings.find((item) => item.id === this.dataset.current);
+      const others = siblings.filter((item) => item.id !== this.dataset.current);
+      const ordered = [current, ...others];
+      const limit = Number(this.dataset.limit || 5);
+      const list = this.querySelector('[data-swatch-list]');
+
+      list.innerHTML = '';
+      ordered.slice(0, limit).forEach((item) => {
+        const li = document.createElement('li');
+        const isCurrent = item.id === this.dataset.current;
+        const el = document.createElement(isCurrent ? 'span' : 'a');
+        el.className = `color-swatch${isCurrent ? ' is-current' : ''}${item.available ? '' : ' is-unavailable'}`;
+        el.style.setProperty('--swatch', item.hex);
+        el.title = item.color;
+        if (isCurrent) {
+          el.setAttribute('aria-current', 'true');
+        } else {
+          el.href = item.url;
+          if (item.image) el.dataset.image = item.image;
+        }
+        const label = document.createElement('span');
+        label.className = 'visually-hidden';
+        label.textContent = item.color;
+        el.append(label);
+        li.append(el);
+        list.append(li);
+      });
+      if (ordered.length > limit) {
+        const more = document.createElement('li');
+        more.className = 'color-swatches__more';
+        more.textContent = `+${ordered.length - limit}`;
+        list.append(more);
+      }
+      this.classList.add('is-loaded');
+      if (this.dataset.mode === 'card') this.setupPreview();
+    }
+
+    /* No desktop, passar o mouse na bolinha mostra a foto da outra cor no card */
+    setupPreview() {
+      if (!window.matchMedia('(hover: hover)').matches) return;
+      const card = this.closest('.product-card');
+      const image = card?.querySelector('.product-card__image');
+      if (!image) return;
+      const original = { src: image.getAttribute('src'), srcset: image.getAttribute('srcset') };
+      this.querySelectorAll('a[data-image]').forEach((link) => {
+        link.addEventListener('mouseenter', () => {
+          image.removeAttribute('srcset');
+          image.src = link.dataset.image;
+        });
+        link.addEventListener('mouseleave', () => {
+          image.src = original.src;
+          if (original.srcset) image.setAttribute('srcset', original.srcset);
+        });
+      });
+    }
+  }
+  customElements.define('color-swatches', ColorSwatches);
+
   window.theme.templateName = document.body.className.match(/template-([\w-]+)/)?.[1];
 
   setupHeader();

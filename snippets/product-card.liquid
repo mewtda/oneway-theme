@@ -154,6 +154,10 @@
     {% render 'price', product: product, show_from: false %}
   </div>
 
+  {%- if settings.card_show_colors -%}
+    {% render 'color-swatches', product: product, mode: 'card' %}
+  {%- endif -%}
+
   {%- if settings.card_show_sizes and size_option -%}
     <ul class="product-card__sizes" aria-label="{{ size_option.name | escape }}">
       {%- for value in size_option.values limit: 4 -%}

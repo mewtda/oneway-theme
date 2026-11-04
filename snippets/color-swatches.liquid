@@ -1,0 +1,34 @@
+{% doc %}
+  Color dots linking products that share the same name with a different color at the end.
+  Renders the current color immediately; theme.js fetches the siblings.
+
+  @param {product} product - The product
+  @param {string} [mode] - "product" (page) or "card", defaults to card
+
+  @example
+  {% render 'color-swatches', product: product, mode: 'product' %}
+{% enddoc %}
+{%- capture color_info -%}{% render 'product-color', product: product %}{%- endcapture -%}
+{%- assign info = color_info | strip | split: '::' -%}
+{%- if info.size == 3 -%}
+  {%- assign swatch_mode = mode | default: 'card' -%}
+  <color-swatches
+    class="color-swatches color-swatches--{{ swatch_mode }}"
+    data-base="{{ info[0] | escape }}"
+    data-current="{{ product.id }}"
+    data-mode="{{ swatch_mode }}"
+    data-limit="{% if swatch_mode == 'card' %}{{ settings.card_colors_limit }}{% else %}20{% endif %}"
+    data-search-url="{{ routes.search_url }}"
+  >
+    {%- if swatch_mode == 'product' -%}
+      <p class="color-swatches__label">{{ 'products.product.color' | t }}: <span>{{ info[1] }}</span></p>
+    {%- endif -%}
+    <ul class="color-swatches__list" data-swatch-list aria-label="{{ 'products.product.other_colors' | t }}">
+      <li>
+        <span class="color-swatch is-current" style="--swatch: {{ info[2] }};" title="{{ info[1] | escape }}">
+          <span class="visually-hidden">{{ info[1] }}</span>
+        </span>
+      </li>
+    </ul>
+  </color-swatches>
+{%- endif -%}

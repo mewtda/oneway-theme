@@ -157,6 +157,37 @@
     ]
   },
   {
+    "name": "Cores dos produtos",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Produtos com o mesmo nome e cores diferentes no final (ex.: \"Vestido Cut Out Curto Off White\" e \"Vestido Cut Out Curto Preto\") ganham bolinhas de cor ligando um ao outro. \"PRÉ-VENDA\" no começo do nome é ignorado."
+      },
+      {
+        "type": "textarea",
+        "id": "color_swatches",
+        "label": "Cores reconhecidas",
+        "info": "Uma por linha, no formato Nome: #código. A cor precisa estar no fim do nome do produto. O metafield custom.cor (tipo cor) do produto tem prioridade",
+        "default": "Preto: #111111\nPreta: #111111\nBranco: #FFFFFF\nBranca: #FFFFFF\nOff White: #F3EEE4\nMarrom: #6B4632\nChocolate: #4A2E22\nCaramelo: #A86B32\nAreia: #D9C7A7\nBege: #D8C3A5\nNude: #E3C2A8\nSavana: #C9A66B\nOnça: #B8864B\nRosa: #E8B4C0\nRosa Queimado: #C98B85\nPink: #E5559A\nVermelho: #B3261E\nVermelha: #B3261E\nVinho: #6A1F2B\nUva: #5B2A4A\nLilás: #B9A3D0\nAzul: #2F4F8F\nAzul Oceano: #1F5E8C\nAzul Claro: #9BB7D4\nClara: #A9C1D9\nVerde: #4E6B48\nVerde Militar: #4B5320\nAmarelo: #E9C649\nAmarela: #E9C649\nLaranja: #E07A2E\nCinza: #9A9A9A\nPrata: #C0C2C4\nDourado: #C9A24A\nBordô: #6D1A2A\nMarsala: #8A3B3B\nTerracota: #B5562F\nMostarda: #C9A030\nCaqui: #A8996B\nOliva: #6B6B3A\nAzul Marinho: #1E2A44\nMarinho: #1E2A44\nJeans: #4A6A8F\nCreme: #F1E6CF\nCappuccino: #8C6A55\nCafé: #5A3B2A\nRoxo: #5B3A7A\nCoral: #E8735F\nSalmão: #F0A38C\nTurquesa: #2FA5A0\nFúcsia: #C2185B\nGrafite: #3C3C3C"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_colors",
+        "label": "Mostrar cores nos cards de produto",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "card_colors_limit",
+        "label": "Máximo de cores no card",
+        "min": 3,
+        "max": 10,
+        "step": 1,
+        "default": 5
+      }
+    ]
+  },
+  {
     "name": "Cards de produto",
     "settings": [
       {

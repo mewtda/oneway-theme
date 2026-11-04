@@ -82,6 +82,11 @@
               {%- endif -%}
             </div>
 
+          {%- when 'colors' -%}
+            <div class="product__colors" {{ block.shopify_attributes }}>
+              {% render 'color-swatches', product: product, mode: 'product' %}
+            </div>
+
           {%- when 'text' -%}
             <div class="product__text rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
 
@@ -369,6 +374,14 @@
       "type": "text",
       "name": "Texto",
       "settings": [{ "type": "richtext", "id": "text", "label": "Texto" }]
+    },
+    {
+      "type": "colors",
+      "name": "Outras cores",
+      "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Bolinhas ligando produtos com o mesmo nome e cor diferente no final. As cores ficam em Configurações do tema → Cores dos produtos." }
+      ]
     },
     { "type": "variant_picker", "name": "Seletor de variantes", "limit": 1 },
     {

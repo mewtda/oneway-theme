@@ -1,0 +1,50 @@
+{% doc %}
+  Detects the color at the end of a product title (ex.: "Vestido Cut Out Curto Off White")
+  using the color list in theme settings, and outputs "base::color::hex".
+  The base is the normalized title without the color and without "pré-venda".
+  Outputs nothing when no color is found.
+
+  @param {product} product - The product
+
+  @example
+  {%- capture color_info -%}{% render 'product-color', product: product %}{%- endcapture -%}
+{% enddoc %}
+{%- liquid
+  assign normalized = product.title | downcase | replace: 'pré-venda', '' | replace: 'pre-venda', '' | replace: 'pré venda', '' | split: ' ' | join: ' ' | strip
+  assign padded = ' ' | append: normalized
+  assign best_hex = ''
+  assign best_size = 0
+
+  assign color_lines = settings.color_swatches | newline_to_br | split: '<br />'
+  for line in color_lines
+    assign parts = line | split: ':'
+    if parts.size < 2
+      continue
+    endif
+    assign color_name = parts[0] | downcase | split: ' ' | join: ' ' | strip
+    if color_name == blank
+      continue
+    endif
+    assign needle = ' ' | append: color_name
+    assign needle_size = needle.size
+    if needle_size > best_size and padded.size > needle_size
+      assign start = 0 | minus: needle_size
+      assign tail = padded | slice: start, needle_size
+      if tail == needle
+        assign best_hex = parts[1] | strip
+        assign best_size = needle_size
+      endif
+    endif
+  endfor
+
+  if best_size > 0
+    assign base_size = padded.size | minus: best_size
+    assign base = padded | slice: 0, base_size | strip
+    assign color_label = product.title | split: ' ' | join: ' ' | strip
+    assign label_size = best_size | minus: 1
+    assign label_start = 0 | minus: label_size
+    assign color_label = color_label | slice: label_start, label_size
+    assign color_value = product.metafields.custom.cor.value | default: best_hex
+    echo base | strip | append: '::' | append: color_label | append: '::' | append: color_value
+  endif
+-%}
