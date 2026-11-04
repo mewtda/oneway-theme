@@ -1,20 +1,72 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "main-collection",
       "blocks": {
-        "pair-1": { "type": "pair", "settings": {} },
-        "featured-1": { "type": "featured", "settings": { "use_second_image": false, "desktop_position": "right" } },
-        "quad-1": { "type": "quad", "settings": {} },
+        "pair-1": {
+          "type": "pair",
+          "settings": {}
+        },
+        "featured-1": {
+          "type": "featured",
+          "settings": {
+            "use_second_image": false,
+            "desktop_position": "right"
+          }
+        },
+        "quad-1": {
+          "type": "quad",
+          "settings": {}
+        },
         "editorial-1": {
           "type": "editorial",
-          "settings": { "title": "Party Collection", "link": "shopify://collections/party", "button_label": "Ver seleção", "text_color": "#FFFFFF", "desktop_width": "full" }
+          "settings": {
+            "image": "shopify://shop_images/banner-partycollection-desk.png",
+            "image_mobile": "shopify://shop_images/banner-partycollection-mobile_10f39c26-9295-4816-9c21-2bb34c6378db.png",
+            "eyebrow": "",
+            "title": "",
+            "link": "shopify://collections/party",
+            "button_label": "",
+            "text_color": "#ffffff",
+            "desktop_width": "full"
+          }
         },
-        "row-1": { "type": "row", "settings": { "count": 4 } },
-        "featured-2": { "type": "featured", "settings": { "use_second_image": false, "desktop_position": "left" } },
-        "quad-2": { "type": "quad", "settings": {} }
+        "row-1": {
+          "type": "row",
+          "settings": {
+            "count": 4
+          }
+        },
+        "featured-2": {
+          "type": "featured",
+          "settings": {
+            "use_second_image": false,
+            "desktop_position": "left"
+          }
+        },
+        "quad-2": {
+          "type": "quad",
+          "settings": {}
+        }
       },
-      "block_order": ["pair-1", "featured-1", "quad-1", "editorial-1", "row-1", "featured-2", "quad-2"],
+      "block_order": [
+        "pair-1",
+        "featured-1",
+        "quad-1",
+        "editorial-1",
+        "row-1",
+        "featured-2",
+        "quad-2"
+      ],
       "settings": {
         "products_per_page": 34,
         "columns_desktop": "4",
@@ -23,10 +75,13 @@
         "pagination_mode": "button",
         "show_description": false,
         "category_parent": "Categorias",
+        "category_menu": "",
         "enable_filtering": true,
         "enable_sorting": true
       }
     }
   },
-  "order": ["main"]
+  "order": [
+    "main"
+  ]
 }
