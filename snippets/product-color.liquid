@@ -1,7 +1,8 @@
 {% doc %}
-  Detects the color at the end of a product title (ex.: "Vestido Cut Out Curto Off White")
-  using the color list in theme settings, and outputs "base::color::hex".
-  The base is the normalized title without the color and without "pré-venda".
+  Detects the color inside a product title using the color list in theme settings and outputs "base::color::hex".
+  Works with the color at the end ("Vestido Cut Out Curto Off White") or in the middle ("Blusa Choker Jersey Preta Decotada").
+  The base is the normalized title without the color and without "pré-venda"; hyphens count as spaces ("Off-White" = "Off White").
+  When several colors appear, the last one wins; on the same position, the longest name wins ("Azul Marinho" over "Marinho").
   Outputs nothing when no color is found.
 
   @param {product} product - The product
@@ -10,10 +11,13 @@
   {%- capture color_info -%}{% render 'product-color', product: product %}{%- endcapture -%}
 {% enddoc %}
 {%- liquid
-  assign normalized = product.title | downcase | replace: 'pré-venda', '' | replace: 'pre-venda', '' | replace: 'pré venda', '' | split: ' ' | join: ' ' | strip
-  assign padded = ' ' | append: normalized
+  assign normalized = product.title | downcase | replace: 'pré-venda', '' | replace: 'pre-venda', '' | replace: 'pré venda', '' | replace: '-', ' ' | split: ' ' | join: ' ' | strip
+  assign padded = ' ' | append: normalized | append: ' '
+  assign best_name = ''
   assign best_hex = ''
+  assign best_end = 0
   assign best_size = 0
+  assign best_base = ''
 
   assign color_lines = settings.color_swatches | newline_to_br | split: '<br />'
   for line in color_lines
@@ -21,30 +25,50 @@
     if parts.size < 2
       continue
     endif
-    assign color_name = parts[0] | downcase | split: ' ' | join: ' ' | strip
+    assign color_name = parts[0] | downcase | replace: '-', ' ' | split: ' ' | join: ' ' | strip
     if color_name == blank
       continue
     endif
-    assign needle = ' ' | append: color_name
-    assign needle_size = needle.size
-    if needle_size > best_size and padded.size > needle_size
-      assign start = 0 | minus: needle_size
-      assign tail = padded | slice: start, needle_size
-      if tail == needle
+    assign needle = ' ' | append: color_name | append: ' '
+    unless padded contains needle
+      continue
+    endunless
+
+    # Posição da última ocorrência: tamanho total menos o que vem depois dela
+    assign pieces = padded | split: needle
+    assign after = ''
+    if padded.size > needle.size
+      assign tail_check_start = 0 | minus: needle.size
+      assign tail_check = padded | slice: tail_check_start, needle.size
+      if tail_check != needle
+        assign after = pieces | last
+      endif
+    endif
+    assign end_pos = padded.size | minus: after.size
+
+    assign better = false
+    if end_pos > best_end
+      assign better = true
+    elsif end_pos == best_end and needle.size > best_size
+      assign better = true
+    endif
+
+    if better
+      assign before_size = end_pos | minus: needle.size
+      assign before = padded | slice: 0, before_size
+      assign base = before | append: ' ' | append: after | split: ' ' | join: ' ' | strip
+      if base != blank
+        assign best_end = end_pos
+        assign best_size = needle.size
+        assign best_name = parts[0] | split: ' ' | join: ' ' | strip
         assign best_hex = parts[1] | strip
-        assign best_size = needle_size
+        assign best_base = base
       endif
     endif
   endfor
 
   if best_size > 0
-    assign base_size = padded.size | minus: best_size
-    assign base = padded | slice: 0, base_size | strip
-    assign color_label = product.title | split: ' ' | join: ' ' | strip
-    assign label_size = best_size | minus: 1
-    assign label_start = 0 | minus: label_size
-    assign color_label = color_label | slice: label_start, label_size
     assign color_value = product.metafields.custom.cor.value | default: best_hex
-    echo base | strip | append: '::' | append: color_label | append: '::' | append: color_value
+    echo best_base | append: '::' | append: best_name | append: '::' | append: color_value
   endif
 -%}
