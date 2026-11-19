@@ -1,0 +1,239 @@
+{%- liquid
+  assign words = section.settings.words | split: ','
+  assign step_blocks = section.blocks | where: 'type', 'step'
+  assign faq_blocks = section.blocks | where: 'type', 'faq'
+  assign form_id = 'BlackAccessForm-' | append: section.id
+-%}
+<div class="black-access" id="BlackAccess-{{ section.id }}">
+  <section class="black-access__hero">
+    <div class="black-access__stage">
+      <h1 class="visually-hidden">{{ words | join: ' ' }} {{ section.settings.offer_label }} {{ section.settings.offer }}</h1>
+      <div class="black-access__words" aria-hidden="true">
+        {%- for word in words -%}
+          <span class="black-access__word{% if forloop.first %} is-active{% endif %}">{{ word | strip }}</span>
+        {%- endfor -%}
+      </div>
+      <p class="black-access__offer">{{ section.settings.offer_label }} <span>{{ section.settings.offer }}</span></p>
+    </div>
+    {%- if section.settings.hero_text != blank -%}
+      <p class="black-access__body">{{ section.settings.hero_text }}</p>
+    {%- endif -%}
+    <p class="black-access__date">
+      {{- section.settings.hero_date -}}
+      {%- if section.settings.hero_date_note != blank -%}<br>{{ section.settings.hero_date_note }}{%- endif -%}
+    </p>
+    <a class="black-access__btn" href="#{{ form_id }}">{{ section.settings.cta_label }}</a>
+    {%- if section.settings.hero_micro != blank -%}
+      <p class="black-access__micro">{{ section.settings.hero_micro }}</p>
+    {%- endif -%}
+  </section>
+
+  {%- if section.settings.countdown_target != blank -%}
+    <section class="black-access__count" aria-label="Contagem regressiva">
+      <div>
+        <p class="black-access__eyebrow">{{ section.settings.countdown_heading }}</p>
+        <p class="black-access__count-date">{{ section.settings.countdown_date }}</p>
+      </div>
+      <div class="black-access__digits" data-countdown="{{ section.settings.countdown_target | escape }}">
+        <div><b data-unit="days">00</b><span>Dias</span></div>
+        <div><b data-unit="hours">00</b><span>Horas</span></div>
+        <div><b data-unit="minutes">00</b><span>Minutos</span></div>
+        <div><b data-unit="seconds">00</b><span>Segundos</span></div>
+      </div>
+      <a class="black-access__btn black-access__btn--light black-access__count-cta" href="#{{ form_id }}">{{ section.settings.cta_label }}</a>
+    </section>
+  {%- endif -%}
+
+  {%- if step_blocks.size > 0 -%}
+    <section class="black-access__section">
+      <p class="black-access__eyebrow">{{ section.settings.steps_eyebrow }}</p>
+      <h2 class="black-access__title">{{ section.settings.steps_heading }}</h2>
+      <div class="black-access__timeline">
+        {%- for block in step_blocks -%}
+          <article class="black-access__step" {{ block.shopify_attributes }}>
+            <p class="black-access__small">{{ forloop.index | prepend: '0' | slice: -2, 2 }} / {{ block.settings.label }}</p>
+            <h3>{{ block.settings.heading }}</h3>
+            <div class="black-access__step-text">{{ block.settings.text }}</div>
+          </article>
+        {%- endfor -%}
+      </div>
+      <a class="black-access__btn black-access__btn--fit" href="#{{ form_id }}">{{ section.settings.cta_label }}</a>
+    </section>
+  {%- endif -%}
+
+  <section class="black-access__register">
+    <div>
+      <h2 class="black-access__title">{{ section.settings.form_heading }}</h2>
+      {%- if section.settings.form_text != blank -%}
+        <div class="black-access__body">{{ section.settings.form_text }}</div>
+      {%- endif -%}
+      {%- if section.settings.form_micro != blank -%}
+        <p class="black-access__micro">{{ section.settings.form_micro }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- form 'customer', id: form_id, class: 'black-access__form', data-black-form: '' -%}
+      {%- assign show_success = false -%}
+      {%- if form.posted_successfully? and request.path == page.url -%}{%- assign show_success = true -%}{%- endif -%}
+      {%- if show_success -%}
+        <div class="black-access__success" role="status">
+          <p class="black-access__eyebrow">{{ section.settings.success_eyebrow }}</p>
+          <h3>{{ section.settings.success_heading }}</h3>
+          <div class="black-access__body">{{ section.settings.success_text }}</div>
+        </div>
+      {%- else -%}
+        <input type="hidden" name="contact[tags]" value="{{ section.settings.customer_tag | escape }}">
+        <input type="hidden" name="contact[phone]" value="" data-phone-target>
+        <label for="BlackName-{{ section.id }}">Nome</label>
+        <input id="BlackName-{{ section.id }}" type="text" name="contact[first_name]" autocomplete="given-name" placeholder="Como podemos chamar você?" required>
+        <label for="BlackEmail-{{ section.id }}">E-mail</label>
+        <input id="BlackEmail-{{ section.id }}" type="email" name="contact[email]" autocomplete="email" placeholder="voce@email.com" required>
+        <label for="BlackPhone-{{ section.id }}">Telefone</label>
+        <input id="BlackPhone-{{ section.id }}" type="tel" autocomplete="tel" inputmode="tel" placeholder="(31) 99999-9999" data-phone-source{% if section.settings.phone_required %} required{% endif %}>
+        {%- if form.errors -%}
+          <p class="black-access__error" role="alert">
+            {%- for field in form.errors -%}
+              {%- if field == 'form' -%}{{ form.errors.messages[field] }}{%- else -%}{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}{%- endif -%}
+              {%- unless forloop.last %}<br>{% endunless -%}
+            {%- endfor -%}
+          </p>
+        {%- endif -%}
+        <button class="black-access__btn black-access__btn--light" type="submit">{{ section.settings.cta_label }}</button>
+        {%- if section.settings.consent_text != blank -%}
+          <p class="black-access__micro">{{ section.settings.consent_text }}</p>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endform -%}
+  </section>
+
+  {%- if faq_blocks.size > 0 -%}
+    <section class="black-access__section black-access__faq">
+      <div>
+        <p class="black-access__eyebrow">{{ section.settings.faq_eyebrow }}</p>
+        <h2 class="black-access__title">{{ section.settings.faq_heading }}</h2>
+      </div>
+      <div>
+        {%- for block in faq_blocks -%}
+          <details {{ block.shopify_attributes }}>
+            <summary>{{ block.settings.question }}</summary>
+            <div class="black-access__answer">{{ block.settings.answer }}</div>
+          </details>
+        {%- endfor -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- if section.settings.sticky_text != blank -%}
+    <div class="black-access__sticky">
+      <span>{{ section.settings.sticky_text }}</span>
+      <a href="#{{ form_id }}">{{ section.settings.sticky_cta }}</a>
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+  (() => {
+    const root = document.getElementById('BlackAccess-{{ section.id }}');
+    if (!root) return;
+
+    const words = [...root.querySelectorAll('.black-access__word')];
+    if (words.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let current = 0;
+      setInterval(() => {
+        words[current].classList.remove('is-active');
+        current = (current + 1) % words.length;
+        words[current].classList.add('is-active');
+      }, {{ section.settings.word_speed }});
+    }
+
+    const digits = root.querySelector('[data-countdown]');
+    if (digits) {
+      const target = new Date(digits.dataset.countdown).getTime();
+      const tick = () => {
+        const t = Math.max(0, Math.floor((target - Date.now()) / 1000)) || 0;
+        const values = { days: Math.floor(t / 86400), hours: Math.floor(t / 3600) % 24, minutes: Math.floor(t / 60) % 60, seconds: t % 60 };
+        Object.entries(values).forEach(([unit, value]) => {
+          const el = digits.querySelector(`[data-unit="${unit}"]`);
+          if (el) el.textContent = String(value).padStart(2, '0');
+        });
+      };
+      if (!Number.isNaN(target)) {
+        tick();
+        setInterval(tick, 1000);
+      }
+    }
+
+    const form = root.querySelector('[data-black-form]');
+    form?.addEventListener('submit', () => {
+      const source = form.querySelector('[data-phone-source]');
+      const target = form.querySelector('[data-phone-target]');
+      if (!source || !target) return;
+      let phone = source.value.replace(/\D/g, '');
+      if (phone.startsWith('0')) phone = phone.replace(/^0+/, '');
+      if (phone.length === 10 || phone.length === 11) phone = `55${phone}`;
+      target.value = phone ? `+${phone}` : '';
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Black · acesso antecipado",
+  "class": "section-black-access",
+  "settings": [
+    { "type": "header", "content": "Topo" },
+    { "type": "text", "id": "words", "label": "Palavras animadas", "info": "Separadas por vírgula", "default": "You’re,first.,Black,Friday.,One,Way." },
+    { "type": "range", "id": "word_speed", "label": "Tempo de cada palavra", "min": 300, "max": 1500, "step": 100, "unit": "ms", "default": 500 },
+    { "type": "text", "id": "offer_label", "label": "Oferta (texto)", "default": "Black Friday" },
+    { "type": "text", "id": "offer", "label": "Oferta (destaque)", "default": "até 60% OFF" },
+    { "type": "text", "id": "hero_text", "label": "Texto", "default": "Cadastre-se para garantir acesso antecipado à Black Friday One Way." },
+    { "type": "text", "id": "hero_date", "label": "Data", "default": "23 de novembro · 14h às 16h" },
+    { "type": "text", "id": "hero_date_note", "label": "Linha abaixo da data", "default": "Acesso exclusivo para clientes cadastradas." },
+    { "type": "text", "id": "cta_label", "label": "Texto do botão", "default": "Quero meu acesso antecipado" },
+    { "type": "text", "id": "hero_micro", "label": "Texto pequeno", "default": "Receba sua senha automaticamente após o cadastro." },
+    { "type": "header", "content": "Contagem regressiva" },
+    { "type": "text", "id": "countdown_target", "label": "Data e hora de início", "info": "Formato 2026-11-23T14:00:00-03:00. Vazio esconde a contagem", "default": "2026-11-23T14:00:00-03:00" },
+    { "type": "text", "id": "countdown_heading", "label": "Título", "default": "Seu acesso antecipado começa em" },
+    { "type": "text", "id": "countdown_date", "label": "Data por extenso", "default": "23.11.2026 · 14h · Horário de Brasília" },
+    { "type": "header", "content": "Passo a passo" },
+    { "type": "text", "id": "steps_eyebrow", "label": "Texto acima do título", "default": "Save the date" },
+    { "type": "text", "id": "steps_heading", "label": "Título", "default": "Seu acesso, passo a passo." },
+    { "type": "header", "content": "Cadastro" },
+    { "type": "text", "id": "customer_tag", "label": "Tag do cliente", "info": "Aplicada a quem se cadastrar por aqui", "default": "black26" },
+    { "type": "checkbox", "id": "phone_required", "label": "Telefone obrigatório", "default": true },
+    { "type": "text", "id": "form_heading", "label": "Título", "default": "Coloque seu nome na lista e compre antes de todo mundo" },
+    { "type": "richtext", "id": "form_text", "label": "Texto", "default": "<p>Cadastre-se para acessar em 23.11, das 14h às 16h.</p>" },
+    { "type": "text", "id": "form_micro", "label": "Texto pequeno", "default": "Período de cadastro: 18 a 22 de novembro." },
+    { "type": "text", "id": "consent_text", "label": "Aviso abaixo do botão", "default": "Ao se cadastrar, você aceita receber comunicações da One Way." },
+    { "type": "text", "id": "success_eyebrow", "label": "Sucesso: texto pequeno", "default": "You're on the list." },
+    { "type": "text", "id": "success_heading", "label": "Sucesso: título", "default": "Você está dentro." },
+    { "type": "richtext", "id": "success_text", "label": "Sucesso: texto", "default": "<p>23 de novembro · 14h às 16h</p>" },
+    { "type": "header", "content": "Dúvidas" },
+    { "type": "text", "id": "faq_eyebrow", "label": "Texto acima do título", "default": "Antes de entrar" },
+    { "type": "text", "id": "faq_heading", "label": "Título", "default": "Alguma dúvida?" },
+    { "type": "header", "content": "Barra fixa no celular" },
+    { "type": "text", "id": "sticky_text", "label": "Texto", "info": "Vazio esconde a barra", "default": "23.11 · 14h às 16h" },
+    { "type": "text", "id": "sticky_cta", "label": "Botão", "default": "Quero entrar antes" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Passo",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Rótulo", "default": "Cadastre-se" },
+        { "type": "text", "id": "heading", "label": "Título", "default": "18 a 22.11" },
+        { "type": "richtext", "id": "text", "label": "Texto" }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "Pergunta",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Pergunta", "default": "Pergunta" },
+        { "type": "richtext", "id": "answer", "label": "Resposta" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Black · acesso antecipado" }]
+}
+{% endschema %}

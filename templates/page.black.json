@@ -1,0 +1,74 @@
+{
+  "sections": {
+    "black": {
+      "type": "black-access",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "label": "Cadastre-se",
+            "heading": "18 a 22.11",
+            "text": "<p>Faça sua inscrição nesta página.<br>Receba a mensagem de confirmação e guarde sua senha.</p>"
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "label": "Acesso exclusivo",
+            "heading": "23.11 · 14h às 16h",
+            "text": "<p>No dia 23, entre no site às 14h com sua senha e aproveite a janela de 2h de acesso antecipado para fazer as suas compras.</p>"
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "label": "Abertura geral",
+            "heading": "23.11 · 18h",
+            "text": "<p>A Black Friday abre<br>para todas as clientes.</p>"
+          }
+        },
+        "faq_1": {
+          "type": "faq",
+          "settings": {
+            "question": "Como recebo minha senha?",
+            "answer": "<p>Após concluir o cadastro, você recebe sua senha automaticamente por WhatsApp.</p>"
+          }
+        },
+        "faq_2": {
+          "type": "faq",
+          "settings": {
+            "question": "Quando posso comprar com acesso antecipado?",
+            "answer": "<p>No dia 23 de novembro, entre no site às 14h com sua senha e aproveite a janela de 2h de acesso para fazer as suas compras. O acesso é exclusivo para clientes cadastradas.</p>"
+          }
+        },
+        "faq_3": {
+          "type": "faq",
+          "settings": {
+            "question": "Quando o site abre para todas as clientes?",
+            "answer": "<p>No dia 23 de novembro, às 18h.</p>"
+          }
+        },
+        "faq_4": {
+          "type": "faq",
+          "settings": {
+            "question": "Qual será o desconto?",
+            "answer": "<p>Até 60% OFF em peças selecionadas da Black Friday One Way.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3",
+        "faq_1",
+        "faq_2",
+        "faq_3",
+        "faq_4"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "black"
+  ]
+}
