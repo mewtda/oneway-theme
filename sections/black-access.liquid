@@ -73,7 +73,11 @@
     </div>
 
     {%- assign form_posted = false -%}
-    {%- form 'customer', id: form_id, class: 'black-access__form', data-black-form: '' -%}
+    {%- assign return_url = request.path | append: '?cadastro=ok' -%}
+    {%- if request.page_type == 'page' and template.suffix != blank and page.template_suffix != template.suffix -%}
+      {%- assign return_url = return_url | append: '&view=' | append: template.suffix -%}
+    {%- endif -%}
+    {%- form 'customer', id: form_id, class: 'black-access__form', data-black-form: '', return_to: return_url -%}
       {%- assign show_success = false -%}
       {%- if form.posted_successfully? and request.path == page.url -%}{%- assign show_success = true -%}{%- endif -%}
       {%- if show_success -%}
@@ -182,14 +186,19 @@
     dialog?.addEventListener('click', (event) => {
       if (event.target === dialog) dialog.close();
     });
-    if (dialog?.hasAttribute('data-open-on-load')) {
-      openDialog();
-      if (window.location.search.includes('customer_posted')) {
-        const params = new URLSearchParams(window.location.search);
-        params.delete('customer_posted');
-        const query = params.toString();
-        window.history.replaceState({}, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+    const pageParams = new URLSearchParams(window.location.search);
+    const postedOnLoad = pageParams.get('cadastro') === 'ok' || pageParams.has('customer_posted');
+    if (dialog?.hasAttribute('data-open-on-load') || (postedOnLoad && !root.querySelector('.black-access__error'))) {
+      const pendingForm = root.querySelector('[data-black-form]');
+      const successBox = pendingForm?.querySelector('[data-black-success]');
+      if (pendingForm && !successBox && dialog) {
+        pendingForm.innerHTML = `<div class="black-access__success" role="status" data-black-success>${dialog.innerHTML.replace(/<button[\s\S]*<\/button>/, '')}</div>`;
       }
+      openDialog();
+      pageParams.delete('cadastro');
+      pageParams.delete('customer_posted');
+      const query = pageParams.toString();
+      window.history.replaceState({}, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
     }
 
     const form = root.querySelector('[data-black-form]');
@@ -243,7 +252,7 @@
         const html = new DOMParser().parseFromString(await response.text(), 'text/html');
         const freshForm = html.getElementById(form.id);
         const freshError = freshForm?.querySelector('.black-access__error');
-        const succeeded = freshForm?.querySelector('[data-black-success]') || (!freshError && response.url.includes('customer_posted=true'));
+        const succeeded = freshForm?.querySelector('[data-black-success]') || (!freshError && /customer_posted=true|cadastro=ok/.test(response.url));
 
         if (succeeded) {
           const success = freshForm?.querySelector('[data-black-success]');
