@@ -72,11 +72,13 @@
       {%- endif -%}
     </div>
 
+    {%- assign form_posted = false -%}
     {%- form 'customer', id: form_id, class: 'black-access__form', data-black-form: '' -%}
       {%- assign show_success = false -%}
       {%- if form.posted_successfully? and request.path == page.url -%}{%- assign show_success = true -%}{%- endif -%}
       {%- if show_success -%}
-        <div class="black-access__success" role="status">
+        {%- assign form_posted = true -%}
+        <div class="black-access__success" role="status" data-black-success>
           <p class="black-access__eyebrow">{{ section.settings.success_eyebrow }}</p>
           <h3>{{ section.settings.success_heading }}</h3>
           <div class="black-access__body">{{ section.settings.success_text }}</div>
@@ -123,6 +125,13 @@
     </section>
   {%- endif -%}
 
+  <dialog class="black-access__dialog" aria-labelledby="BlackDialogTitle-{{ section.id }}" data-black-dialog{% if form_posted %} data-open-on-load{% endif %}>
+    <p class="black-access__eyebrow">{{ section.settings.success_eyebrow }}</p>
+    <h3 id="BlackDialogTitle-{{ section.id }}">{{ section.settings.success_heading }}</h3>
+    <div class="black-access__body">{{ section.settings.success_text }}</div>
+    <button type="button" class="black-access__btn" data-black-dialog-close>{{ section.settings.success_close }}</button>
+  </dialog>
+
   {%- if section.settings.sticky_text != blank -%}
     <div class="black-access__sticky">
       <span>{{ section.settings.sticky_text }}</span>
@@ -163,15 +172,100 @@
       }
     }
 
+    const dialog = root.querySelector('[data-black-dialog]');
+    const openDialog = () => {
+      if (!dialog) return;
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    };
+    dialog?.querySelector('[data-black-dialog-close]')?.addEventListener('click', () => dialog.close?.() ?? dialog.removeAttribute('open'));
+    dialog?.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    if (dialog?.hasAttribute('data-open-on-load')) {
+      openDialog();
+      if (window.location.search.includes('customer_posted')) {
+        const params = new URLSearchParams(window.location.search);
+        params.delete('customer_posted');
+        const query = params.toString();
+        window.history.replaceState({}, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+      }
+    }
+
     const form = root.querySelector('[data-black-form]');
-    form?.addEventListener('submit', () => {
+    if (!form) return;
+
+    const fillPhone = () => {
       const source = form.querySelector('[data-phone-source]');
       const target = form.querySelector('[data-phone-target]');
       if (!source || !target) return;
-      let phone = source.value.replace(/\D/g, '');
-      if (phone.startsWith('0')) phone = phone.replace(/^0+/, '');
+      let phone = source.value.replace(/\D/g, '').replace(/^0+/, '');
       if (phone.length === 10 || phone.length === 11) phone = `55${phone}`;
       target.value = phone ? `+${phone}` : '';
+    };
+
+    const showError = (html) => {
+      let error = form.querySelector('.black-access__error');
+      if (!error) {
+        error = document.createElement('p');
+        error.className = 'black-access__error';
+        error.setAttribute('role', 'alert');
+        form.querySelector('button[type="submit"]')?.before(error);
+      }
+      error.innerHTML = html;
+    };
+
+    form.addEventListener('submit', async (event) => {
+      fillPhone();
+      if (!window.fetch || !window.DOMParser) return;
+      event.preventDefault();
+
+      const button = form.querySelector('button[type="submit"]');
+      const label = button?.textContent;
+      if (button) {
+        button.disabled = true;
+        button.textContent = {{ section.settings.sending_label | json }};
+      }
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          credentials: 'same-origin',
+          headers: { Accept: 'text/html' }
+        });
+
+        if (response.url.includes('/challenge')) {
+          form.submit();
+          return;
+        }
+
+        const html = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const freshForm = html.getElementById(form.id);
+        const freshError = freshForm?.querySelector('.black-access__error');
+        const succeeded = freshForm?.querySelector('[data-black-success]') || (!freshError && response.url.includes('customer_posted=true'));
+
+        if (succeeded) {
+          const success = freshForm?.querySelector('[data-black-success]');
+          form.innerHTML = success ? success.outerHTML : '';
+          openDialog();
+          return;
+        }
+
+        if (freshError) {
+          showError(freshError.innerHTML);
+          return;
+        }
+
+        form.submit();
+      } catch (error) {
+        showError({{ section.settings.error_label | json }});
+      } finally {
+        if (button && button.isConnected) {
+          button.disabled = false;
+          button.textContent = label;
+        }
+      }
     });
   })();
 </script>
@@ -208,6 +302,9 @@
     { "type": "text", "id": "success_eyebrow", "label": "Sucesso: texto pequeno", "default": "You're on the list." },
     { "type": "text", "id": "success_heading", "label": "Sucesso: título", "default": "Você está dentro." },
     { "type": "richtext", "id": "success_text", "label": "Sucesso: texto", "default": "<p>23 de novembro · 14h às 16h</p>" },
+    { "type": "text", "id": "success_close", "label": "Sucesso: botão de fechar", "default": "Continuar navegando" },
+    { "type": "text", "id": "sending_label", "label": "Botão enquanto envia", "default": "Enviando…" },
+    { "type": "text", "id": "error_label", "label": "Erro de conexão", "default": "Não conseguimos enviar agora. Tente de novo em instantes." },
     { "type": "header", "content": "Dúvidas" },
     { "type": "text", "id": "faq_eyebrow", "label": "Texto acima do título", "default": "Antes de entrar" },
     { "type": "text", "id": "faq_heading", "label": "Título", "default": "Alguma dúvida?" },

@@ -5068,6 +5068,42 @@ a.color-swatch::before {
   font-weight: 400;
 }
 
+.black-access__dialog {
+  width: min(28rem, calc(100% - 2rem));
+  padding: 2.5rem 2rem 2rem;
+  border: 1px solid #555;
+  background: var(--ba-dark);
+  color: var(--ba-bg);
+  text-align: center;
+}
+
+.black-access__dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.black-access__dialog h3 {
+  margin: 1rem 0 0.75rem;
+  font-size: 2.25rem;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.black-access__dialog .black-access__body {
+  margin: 0 auto 1.75rem;
+  color: #c2c2bd;
+}
+
+.black-access__dialog .black-access__btn {
+  max-width: none;
+  border-color: var(--ba-bg);
+  background: var(--ba-bg);
+  color: var(--ba-ink);
+}
+
+.black-access__dialog .black-access__btn:hover { background: #ddd; }
+
+.black-access__form button:disabled { opacity: 0.6; cursor: wait; }
+
 .black-access__sticky { display: none; }
 
 @media (max-width: 749px) {
