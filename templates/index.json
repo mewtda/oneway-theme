@@ -50,7 +50,7 @@
             "button_label": "Ver seleção",
             "desktop_width": "half",
             "ratio_desktop": "4 / 5",
-            "ratio_mobile": "4 / 5",
+            "ratio_mobile": "screen",
             "text_position": "bottom-center"
           }
         },
@@ -65,7 +65,7 @@
             "button_label": "Ver seleção",
             "desktop_width": "half",
             "ratio_desktop": "4 / 5",
-            "ratio_mobile": "4 / 5",
+            "ratio_mobile": "screen",
             "text_position": "bottom-center"
           }
         },
@@ -80,7 +80,7 @@
             "button_label": "Ver seleção",
             "desktop_width": "full",
             "ratio_desktop": "21 / 9",
-            "ratio_mobile": "4 / 5",
+            "ratio_mobile": "screen",
             "text_position": "center"
           }
         },
@@ -95,7 +95,7 @@
             "button_label": "Ver seleção",
             "desktop_width": "half",
             "ratio_desktop": "4 / 5",
-            "ratio_mobile": "4 / 5",
+            "ratio_mobile": "screen",
             "text_position": "bottom-center"
           }
         },
@@ -110,7 +110,7 @@
             "button_label": "Ver seleção",
             "desktop_width": "half",
             "ratio_desktop": "4 / 5",
-            "ratio_mobile": "4 / 5",
+            "ratio_mobile": "screen",
             "text_position": "bottom-center"
           }
         }

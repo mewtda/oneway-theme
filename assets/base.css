@@ -3165,6 +3165,14 @@ h4,
   background: var(--color-background-alt);
 }
 
+@media (max-width: 749px) {
+  .banner-entries__grid:not(.banner-entries__grid--mobile-2) .banner-entry--mobile-screen .banner-entry__media {
+    aspect-ratio: auto;
+    height: 100vh;
+    height: 100svh;
+  }
+}
+
 .banner-entry__media::after {
   content: '';
   position: absolute;

@@ -28,7 +28,7 @@
         assign link = block.settings.link | default: block.settings.collection.url
       -%}
       <div
-        class="banner-entry banner-entry--{{ block.settings.desktop_width }} banner-entry--text-{{ block.settings.text_position }}"
+        class="banner-entry banner-entry--{{ block.settings.desktop_width }} banner-entry--text-{{ block.settings.text_position }}{% if block.settings.ratio_mobile == 'screen' %} banner-entry--mobile-screen{% endif %}"
         style="--ratio-desktop: {{ block.settings.ratio_desktop }}; --ratio-mobile: {{ block.settings.ratio_mobile }};"
         {{ block.shopify_attributes }}
       >
@@ -132,12 +132,13 @@
           "id": "ratio_mobile",
           "label": "Formato no celular",
           "options": [
+            { "value": "screen", "label": "Tela inteira" },
             { "value": "3 / 4", "label": "Retrato (3:4)" },
             { "value": "4 / 5", "label": "Retrato (4:5)" },
             { "value": "2 / 3", "label": "Retrato alongado (2:3)" },
             { "value": "1 / 1", "label": "Quadrado" }
           ],
-          "default": "4 / 5"
+          "default": "screen"
         },
         {
           "type": "select",
