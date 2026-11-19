@@ -317,7 +317,7 @@
 
       const optionValueIds = [...this.querySelectorAll('input:checked')].map((input) => input.dataset.optionValueId);
       const sectionId = this.dataset.sectionId;
-      const section = this.closest('[data-section-id]');
+      const section = this.parentElement?.closest('[data-section-id]');
       const url = `${this.dataset.url}?option_values=${optionValueIds.join(',')}&section_id=${sectionId}`;
 
       section?.querySelector('[data-add-to-cart]')?.classList.add('is-loading');
@@ -761,6 +761,24 @@
         document.body.classList.toggle('has-sticky-buy', show);
       });
       this.observer.observe(target);
+
+      // Tamanhos na barra: marca o mesmo tamanho no seletor principal
+      this.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-sticky-size]');
+        if (!button) return;
+        const group = button.closest('[data-sticky-sizes]');
+        const input = [...(section?.querySelectorAll('variant-picker input[type="radio"]') || [])].find(
+          (radio) => radio.name === group?.dataset.stickySizes && radio.value === button.dataset.stickySize
+        );
+        if (!input || input.checked) return;
+        input.checked = true;
+        group.querySelectorAll('[data-sticky-size]').forEach((item) => {
+          const selected = item === button;
+          item.classList.toggle('is-selected', selected);
+          item.setAttribute('aria-pressed', String(selected));
+        });
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
     }
 
     disconnectedCallback() {

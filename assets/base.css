@@ -3947,6 +3947,42 @@ fieldset.filter-group .filter-group__list {
   transform: none;
 }
 
+.sticky-buy__sizes {
+  display: flex;
+  gap: 0.375rem;
+  padding-top: 0.625rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sticky-buy__sizes::-webkit-scrollbar {
+  display: none;
+}
+
+.sticky-buy__size {
+  flex-shrink: 0;
+  min-width: 2.75rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--color-border);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.sticky-buy__size.is-selected {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
+.sticky-buy__size.is-unavailable:not(.is-selected) {
+  color: var(--color-text-muted);
+  background-image: linear-gradient(to top right, transparent calc(50% - 0.5px), var(--color-border) 50%, transparent calc(50% + 0.5px));
+}
+
 .sticky-buy__inner {
   display: flex;
   align-items: center;
@@ -3997,7 +4033,7 @@ fieldset.filter-group .filter-group__list {
 }
 
 body.has-sticky-buy .whatsapp-float {
-  bottom: 5rem;
+  bottom: 8rem;
 }
 
 /* Vitrine de recomendações */

@@ -319,6 +319,19 @@
 
   {%- if section.settings.sticky_bar -%}
     <sticky-buy-bar class="sticky-buy" data-sticky-bar aria-hidden="true">
+      {%- if size_option_name != blank -%}
+        {%- for option in product.options_with_values -%}
+          {%- if option.name == size_option_name -%}
+            <div class="sticky-buy__sizes page-width" role="group" aria-label="{{ option.name | escape }}" data-sticky-sizes="{{ option.name | escape }}-{{ section.id }}">
+              {%- for value in option.values -%}
+                <button type="button" class="sticky-buy__size{% unless value.available %} is-unavailable{% endunless %}{% if value.selected %} is-selected{% endif %}" data-sticky-size="{{ value | escape }}" aria-pressed="{% if value.selected %}true{% else %}false{% endif %}">
+                  {{- value -}}
+                </button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
       <div class="sticky-buy__inner page-width">
         <div class="sticky-buy__product">
           {%- if product.featured_media -%}
