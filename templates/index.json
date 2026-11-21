@@ -15,8 +15,8 @@
         "slide-1": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/banner_2_desk_shop_now.png",
-            "image_mobile": "shopify://shop_images/banner_2_shop_now_mobile.png",
+            "image": "shopify://shop_images/banner_desk.png",
+            "image_mobile": "shopify://shop_images/banner_mobile_5e8d01f8-2428-4a3b-8cbc-eba5183b7d9d.png",
             "heading": "",
             "subheading": "",
             "button_label": "",
