@@ -141,7 +141,13 @@
     {%- endif -%}
 
     {%- if product.available == false -%}
-      <span class="badge">{{ 'products.product.sold_out' | t }}</span>
+      <div class="product-card__badges">
+        <span class="badge">{{ 'products.product.sold_out' | t }}</span>
+        <a href="{{ product.url }}" class="badge badge--notify">
+          {%- render 'icon', name: 'bell' -%}
+          Avise quando chegar
+        </a>
+      </div>
     {%- elsif on_sale -%}
       <span class="badge badge--sale">{{ 'products.product.on_sale' | t }}</span>
     {%- endif -%}

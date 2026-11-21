@@ -3763,6 +3763,36 @@ fieldset.filter-group .filter-group__list {
   font-weight: 500;
 }
 
+.product-card__badges {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  pointer-events: none;
+}
+
+.product-card__badges .badge {
+  position: static;
+}
+
+.badge--notify {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.badge--notify .icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
 /* --------------------------------------------------------------------------
    Produto
    -------------------------------------------------------------------------- */
