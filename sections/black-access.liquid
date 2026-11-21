@@ -94,8 +94,8 @@
         <input id="BlackName-{{ section.id }}" type="text" name="contact[first_name]" autocomplete="given-name" placeholder="Como podemos chamar você?" required>
         <label for="BlackEmail-{{ section.id }}">E-mail</label>
         <input id="BlackEmail-{{ section.id }}" type="email" name="contact[email]" autocomplete="email" placeholder="voce@email.com" required>
-        <label for="BlackPhone-{{ section.id }}">Telefone</label>
-        <input id="BlackPhone-{{ section.id }}" type="tel" autocomplete="tel" inputmode="tel" placeholder="(31) 99999-9999" data-phone-source{% if section.settings.phone_required %} required{% endif %}>
+        <label for="BlackPhone-{{ section.id }}">Celular (WhatsApp)</label>
+        <input id="BlackPhone-{{ section.id }}" type="tel" autocomplete="tel" inputmode="tel" placeholder="(31) 99999-9999" data-phone-source required minlength="10" title="Informe seu celular com DDD, ex.: (31) 99999-9999">
         {%- if form.errors -%}
           <p class="black-access__error" role="alert">
             {%- for field in form.errors -%}
@@ -224,7 +224,23 @@
       error.innerHTML = html;
     };
 
+    const phoneSource = form.querySelector('[data-phone-source]');
+    const validatePhone = () => {
+      if (!phoneSource) return true;
+      let digits = phoneSource.value.replace(/\D/g, '').replace(/^0+/, '');
+      if (digits.length > 11 && digits.startsWith('55')) digits = digits.slice(2);
+      const valid = /^[1-9]{2}9\d{8}$/.test(digits);
+      phoneSource.setCustomValidity(valid ? '' : 'Informe seu celular com DDD, ex.: (31) 99999-9999');
+      return valid;
+    };
+    phoneSource?.addEventListener('input', () => phoneSource.setCustomValidity(''));
+
     form.addEventListener('submit', async (event) => {
+      if (!validatePhone()) {
+        event.preventDefault();
+        phoneSource.reportValidity();
+        return;
+      }
       fillPhone();
       if (!window.fetch || !window.DOMParser) return;
       event.preventDefault();
@@ -303,7 +319,6 @@
     { "type": "text", "id": "steps_heading", "label": "Título", "default": "Seu acesso, passo a passo." },
     { "type": "header", "content": "Cadastro" },
     { "type": "text", "id": "customer_tag", "label": "Tag do cliente", "info": "Aplicada a quem se cadastrar por aqui", "default": "black26" },
-    { "type": "checkbox", "id": "phone_required", "label": "Telefone obrigatório", "default": true },
     { "type": "text", "id": "form_heading", "label": "Título", "default": "Coloque seu nome na lista e compre antes de todo mundo" },
     { "type": "richtext", "id": "form_text", "label": "Texto", "default": "<p>Cadastre-se para acessar em 23.11, das 14h às 16h.</p>" },
     { "type": "text", "id": "form_micro", "label": "Texto pequeno", "default": "Período de cadastro: 18 a 22 de novembro." },
